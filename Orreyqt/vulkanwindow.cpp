@@ -19,8 +19,6 @@ VulkanWindow::VulkanWindow()
 {
 	m_timer = new QTimer(this);
 	QObject::connect(m_timer, SIGNAL(timeout()), this, SLOT(MainLoop()));
-	QObject::connect(this, SIGNAL(widthChanged(int)), this, SLOT(RecreateSwapchain()));
-	QObject::connect(this, SIGNAL(heightChanged(int)), this, SLOT(RecreateSwapchain()));
 }
 
 VulkanWindow::~VulkanWindow()
@@ -115,6 +113,10 @@ void VulkanWindow::wheelEvent(QWheelEvent* e) {
 
 	m_camera.zoom += e->angleDelta().y() / 120;
 	m_camera.viewUpdated = true;
+}
+
+void VulkanWindow::resizeEvent(QResizeEvent* ev) {
+	RecreateSwapchain();
 }
 
 void VulkanWindow::togglePaused() {
@@ -806,7 +808,7 @@ double VulkanWindow::GetTimeQueryResult(uint32_t timeStampValidBits)
 }
 
 void VulkanWindow::MainLoop() {
-	
+
 	auto tStart = std::chrono::high_resolution_clock::now();
 
 	RenderFrame();
@@ -831,8 +833,8 @@ void VulkanWindow::MainLoop() {
 	auto tEnd = std::chrono::high_resolution_clock::now();
 	auto tDiff = std::chrono::duration<double, std::milli>(tEnd - tStart).count();
 	m_frameTime = (float)tDiff / 1000.0f;
-//	int fps = static_cast<int>(1.f / m_frameTime);
-//	spdlog::info("fps: {}", fps);
+	//	int fps = static_cast<int>(1.f / m_frameTime);
+	//	spdlog::info("fps: {}", fps);
 	emit updateFPSLcd(m_frameTime);
 
 	m_totalRunTime += m_frameTime;
@@ -847,8 +849,8 @@ void VulkanWindow::MainLoop() {
 void VulkanWindow::RecreateSwapchain() {
 
 	if (m_vulkanResources != nullptr) {
-		Cleanup();
-		Init();
+		//		Cleanup();
+		//		Init();
 	}
 }
 

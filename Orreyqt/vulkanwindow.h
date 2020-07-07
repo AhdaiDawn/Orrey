@@ -12,11 +12,9 @@
 
 class VulkanWindow : public QWindow, private Vulkan {
 	Q_OBJECT
-public slots:
 
+public slots:
 	void MainLoop();
-	void RecreateSwapchain();
-//	void changeframebufferSize();
 
 signals:
 	void updateFPSLcd(int);
@@ -31,11 +29,13 @@ public:
 	void keyPressEvent(QKeyEvent*) override;
 	void keyReleaseEvent(QKeyEvent*) override;
 	void wheelEvent(QWheelEvent*) override;
+	void resizeEvent(QResizeEvent* ev) override;
 
 	void Run();
 	void Init();
 	void Cleanup();
 	void togglePaused();
+	void RecreateSwapchain();
 	void UpdateMouseCamera(float xPos, float yPos, float deltaTime);
 	void UpdateKeyCamera(float deltaTime);
 
