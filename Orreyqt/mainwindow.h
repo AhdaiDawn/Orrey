@@ -2,8 +2,17 @@
 #define MAINWINDOW_H
 
 #include <QWidget>
+#include <QLabel>
+#include <QLCDNumber>
+#include <QPushButton>
+#include <QGridLayout>
+#include<QDateTime>
+#include<QScreen>
 #include<QtWidgets/QSlider>
+#include<QFileDialog>
 #include <QtWidgets/QTreeWidget>
+#include <QtWidgets/QTextBrowser>
+
 
 QT_BEGIN_NAMESPACE
 class QLCDNumber;
@@ -24,10 +33,12 @@ public:
 	MainWindow(VulkanWindow* vulkanwindow);
 	~MainWindow();
 
-private:
 
+private:
+	void resizeEvent(QResizeEvent* ev) override;
 	void closeEvent(QCloseEvent* e) override;
 
+	void settingUI();
 
 	QLCDNumber* FPSLcd;
 	QPushButton* grabButton;
@@ -37,6 +48,9 @@ private:
 	VulkanWindow* vulkanwindow;
 	QSlider* speedSlider;
 	QTreeWidget* treeWidget;
+	QTextBrowser* textBrowser;
+
+	QRect lastGeometry;
 };
 
 #endif

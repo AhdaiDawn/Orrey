@@ -29,7 +29,6 @@ public:
 	void keyPressEvent(QKeyEvent*) override;
 	void keyReleaseEvent(QKeyEvent*) override;
 	void wheelEvent(QWheelEvent*) override;
-	void resizeEvent(QResizeEvent* ev) override;
 
 	void Run();
 	void Init();

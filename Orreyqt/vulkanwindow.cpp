@@ -115,10 +115,6 @@ void VulkanWindow::wheelEvent(QWheelEvent* e) {
 	m_camera.viewUpdated = true;
 }
 
-void VulkanWindow::resizeEvent(QResizeEvent* ev) {
-	RecreateSwapchain();
-}
-
 bool VulkanWindow::togglePaused() {
 	if (m_timer->isActive())
 		m_timer->stop();
@@ -859,8 +855,7 @@ void VulkanWindow::RecreateSwapchain() {
 		m_vulkanResources->device.waitIdle();
 
 		//Ïú»Ù
-		m_bufferVertex.Destroy();
-		m_bufferIndex.Destroy();
+		spdlog::info("VulkanWindow::RecreateSwapchain cleanup");
 		m_bufferInstance.Destroy();
 
 		m_vulkanResources->device.destroyQueryPool(m_queryPool);
@@ -878,8 +873,6 @@ void VulkanWindow::RecreateSwapchain() {
 		m_vulkanResources->device.destroyPipelineLayout(m_graphics.pipelinePlanets.layout);
 		m_vulkanResources->device.destroyPipelineLayout(m_graphics.pipelineSkySphere.layout);
 
-		m_vulkanResources->device.destroySemaphore(m_graphics.semaphore);
-
 		m_compute.uniformBuffer.Destroy();
 		m_compute.commandPool.Destroy();
 		m_vulkanResources->device.destroyDescriptorSetLayout(m_compute.descriptorSetLayout);
@@ -887,7 +880,6 @@ void VulkanWindow::RecreateSwapchain() {
 		m_vulkanResources->device.destroyPipelineLayout(m_compute.pipelineLayout);
 		m_vulkanResources->device.destroySemaphore(m_compute.semaphore);
 
-		spdlog::info("vulkan::cleanup");
 		m_vulkanResources->device.waitIdle();
 
 		m_vulkanResources->device.destroySampler(m_vulkanResources->depthImage.sampler);
@@ -907,32 +899,17 @@ void VulkanWindow::RecreateSwapchain() {
 			enable_orbits = !enable_orbits;
 
 		//ÖØ½¨
+		spdlog::info("VulkanWindow::RecreateSwapchain recreate");
 		pickPhysicalDevice();
 		CreateSwapchain();
 		CreateRenderpass();
 		CreateFramebuffers();
 		m_sphere = SolidSphere(0.5, 20, 20);
 
-		//Setup vertex and ubo buffer for graphics
-		vko::Buffer vertexStagingBuffer = CreateBuffer(m_sphere.GetVerticesSize(), vk::BufferUsageFlagBits::eTransferSrc, m_sphere.GetVertices().data());
-		vko::Buffer indexStagingBuffer = CreateBuffer(m_sphere.GetIndiciesSize(), vk::BufferUsageFlagBits::eTransferSrc, m_sphere.GetIndicies().data());
-		m_bufferVertex = CreateBuffer(m_sphere.GetVerticesSize(), vk::BufferUsageFlagBits::eVertexBuffer | vk::BufferUsageFlagBits::eTransferDst, nullptr, vk::MemoryPropertyFlagBits::eDeviceLocal);
-		m_bufferIndex = CreateBuffer(m_sphere.GetIndiciesSize(), vk::BufferUsageFlagBits::eIndexBuffer | vk::BufferUsageFlagBits::eTransferDst, nullptr, vk::MemoryPropertyFlagBits::eDeviceLocal);
-
-
-		CopyBuffer(vertexStagingBuffer, m_bufferVertex, m_sphere.GetVerticesSize());
-		CopyBuffer(indexStagingBuffer, m_bufferIndex, m_sphere.GetIndiciesSize());
-		spdlog::info("Created Buffers");
 
 		m_graphics.uniformBuffer = CreateBuffer(sizeof(m_graphics.ubo), vk::BufferUsageFlagBits::eUniformBuffer);
 		m_graphics.uniformBuffer.Map();
 		memcpy(m_graphics.uniformBuffer.mapped, &m_graphics.ubo, sizeof(m_graphics.ubo));
-
-		vertexStagingBuffer.Destroy();
-		indexStagingBuffer.Destroy();
-
-		m_graphics.semaphore = m_vulkanResources->device.createSemaphore(vk::SemaphoreCreateInfo());
-
 
 		//Create query pool to time compute, and rendering times
 		vk::QueryPoolCreateInfo queryPoolInfo = vk::QueryPoolCreateInfo({}, vk::QueryType::eTimestamp, 2, {});

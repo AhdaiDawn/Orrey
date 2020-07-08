@@ -19,8 +19,7 @@ int main(int argc, char* argv[]) {
 	VulkanWindow* vulkanwindow = new VulkanWindow();
 
 	MainWindow mainwindow(vulkanwindow);
-		mainwindow.resize(WIDTH, HEIGHT);
-//	mainwindow.showFullScreen();
+//		mainwindow.resize(WIDTH, HEIGHT);
 	mainwindow.show();
 
 	vulkanwindow->Run();
