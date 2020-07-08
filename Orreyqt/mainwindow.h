@@ -13,7 +13,6 @@
 #include <QtWidgets/QTreeWidget>
 #include <QtWidgets/QTextBrowser>
 
-
 QT_BEGIN_NAMESPACE
 class QLCDNumber;
 class QLabel;
@@ -32,7 +31,6 @@ public slots:
 public:
 	MainWindow(VulkanWindow* vulkanwindow);
 	~MainWindow();
-
 
 private:
 	void resizeEvent(QResizeEvent* ev) override;
