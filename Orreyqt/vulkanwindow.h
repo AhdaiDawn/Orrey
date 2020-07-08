@@ -34,8 +34,9 @@ public:
 	void Run();
 	void Init();
 	void Cleanup();
-	void togglePaused();
+	bool togglePaused();
 	void RecreateSwapchain();
+	bool hideOrbits();
 	void UpdateMouseCamera(float xPos, float yPos, float deltaTime);
 	void UpdateKeyCamera(float deltaTime);
 
@@ -68,7 +69,8 @@ private:
 	double xPos, yPos;
 	bool m_mouse_pressed = false;
 	bool m_key_pressed = false;
-
+	bool enable_hide=false; 
+	bool enable_orbits=true; 
 
 	QTimer* m_timer;
 	SolidSphere m_sphere;

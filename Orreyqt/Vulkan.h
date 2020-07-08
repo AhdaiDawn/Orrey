@@ -27,7 +27,8 @@
 class VulkanWindow;
 class Vulkan
 {
-private:
+//private:
+public:
 	struct {
 		PFN_vkCreateDebugUtilsMessengerEXT vkCreateDebugUtilsMessengerEXT;
 		PFN_vkDestroyDebugUtilsMessengerEXT vkDestroyDebugUtilsMessengerEXT;

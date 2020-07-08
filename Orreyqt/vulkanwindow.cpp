@@ -119,11 +119,12 @@ void VulkanWindow::resizeEvent(QResizeEvent* ev) {
 	RecreateSwapchain();
 }
 
-void VulkanWindow::togglePaused() {
+bool VulkanWindow::togglePaused() {
 	if (m_timer->isActive())
 		m_timer->stop();
 	else
 		m_timer->start();
+	return !(m_timer->isActive());
 }
 
 void VulkanWindow::Init() {
@@ -325,24 +326,26 @@ void VulkanWindow::PrepareInstance()
 
 	instanceStagingBuffer.Destroy();
 
-	//Roughly calculate the orbits for drawing
-	std::vector<glm::vec2> allPoints;
-	int offset = 0;
-	for (int i = 1; i < 9; i++)
-	{
-		std::vector<glm::vec2> points = CalculateOrbitPoints(objects[i].position, objects[i].velocity, G, 0.5 * (objects[i].position.x / SCALE));
-		allPoints.insert(allPoints.end(), points.begin(), points.end());
-		m_orbitVertexInfo.offsets.push_back(offset);
-		offset += points.size();
-		m_orbitVertexInfo.vertices.push_back(points.size());
+	if (enable_orbits) {
+		//Roughly calculate the orbits for drawing
+		std::vector<glm::vec2> allPoints;
+		int offset = 0;
+		for (int i = 1; i < 9; i++)
+		{
+			std::vector<glm::vec2> points = CalculateOrbitPoints(objects[i].position, objects[i].velocity, G, 0.5 * (objects[i].position.x / SCALE));
+			allPoints.insert(allPoints.end(), points.begin(), points.end());
+			m_orbitVertexInfo.offsets.push_back(offset);
+			offset += points.size();
+			m_orbitVertexInfo.vertices.push_back(points.size());
+		}
+
+		//Copy orbit data into its vertex buffer (drawn as lines)
+		vko::Buffer vertexStagingBuffer = CreateBuffer(allPoints.size() * sizeof(glm::vec2), vk::BufferUsageFlagBits::eTransferSrc, allPoints.data());
+		m_orbitVertexInfo.m_bufferVertexOrbit = CreateBuffer(allPoints.size() * sizeof(glm::vec2), vk::BufferUsageFlagBits::eVertexBuffer | vk::BufferUsageFlagBits::eTransferDst, nullptr, vk::MemoryPropertyFlagBits::eDeviceLocal);
+
+		CopyBuffer(vertexStagingBuffer, m_orbitVertexInfo.m_bufferVertexOrbit, allPoints.size() * sizeof(glm::vec2));
+		vertexStagingBuffer.Destroy();
 	}
-
-	//Copy orbit data into its vertex buffer (drawn as lines)
-	vko::Buffer vertexStagingBuffer = CreateBuffer(allPoints.size() * sizeof(glm::vec2), vk::BufferUsageFlagBits::eTransferSrc, allPoints.data());
-	m_orbitVertexInfo.m_bufferVertexOrbit = CreateBuffer(allPoints.size() * sizeof(glm::vec2), vk::BufferUsageFlagBits::eVertexBuffer | vk::BufferUsageFlagBits::eTransferDst, nullptr, vk::MemoryPropertyFlagBits::eDeviceLocal);
-
-	CopyBuffer(vertexStagingBuffer, m_orbitVertexInfo.m_bufferVertexOrbit, allPoints.size() * sizeof(glm::vec2));
-	vertexStagingBuffer.Destroy();
 }
 
 void VulkanWindow::CreateCommandBuffers()
@@ -391,11 +394,13 @@ void VulkanWindow::CreateCommandBuffers()
 		m_vulkanResources->commandBuffers[i].writeTimestamp(vk::PipelineStageFlagBits::eBottomOfPipe, m_queryPool, 1);
 
 		//Draw orbits
-		m_vulkanResources->commandBuffers[i].bindPipeline(vk::PipelineBindPoint::eGraphics, m_graphics.pipelineOrbits.pipeline);
-		m_vulkanResources->commandBuffers[i].bindVertexBuffers(0, m_orbitVertexInfo.m_bufferVertexOrbit.buffer, { 0 });
-		for (int j = 0; j < m_orbitVertexInfo.vertices.size(); j++)
-		{
-			m_vulkanResources->commandBuffers[i].draw(m_orbitVertexInfo.vertices[j], 1, m_orbitVertexInfo.offsets[j], 0);
+		if (enable_orbits) {
+			m_vulkanResources->commandBuffers[i].bindPipeline(vk::PipelineBindPoint::eGraphics, m_graphics.pipelineOrbits.pipeline);
+			m_vulkanResources->commandBuffers[i].bindVertexBuffers(0, m_orbitVertexInfo.m_bufferVertexOrbit.buffer, { 0 });
+			for (int j = 0; j < m_orbitVertexInfo.vertices.size(); j++)
+			{
+				m_vulkanResources->commandBuffers[i].draw(m_orbitVertexInfo.vertices[j], 1, m_orbitVertexInfo.offsets[j], 0);
+			}
 		}
 
 		m_vulkanResources->commandBuffers[i].endRenderPass();
@@ -527,19 +532,21 @@ void VulkanWindow::CreateGraphicsPipeline()
 	m_vulkanResources->device.destroyShaderModule(vertShader);
 	m_vulkanResources->device.destroyShaderModule(fragShader);
 
-	//Orbit pipeline - Uses same layout as planets(ubo, texture array)- we just don't access the array in the fragment shader
-	inputAssembly.topology = vk::PrimitiveTopology::eLineStrip;
-	vertexAttributeDescriptions = { vk::VertexInputAttributeDescription(0, 0, vk::Format::eR32G32Sfloat, 0) }; //Change vertex input
-	bindingDesc = { vk::VertexInputBindingDescription(0, sizeof(glm::vec2)) };
-	vertexInputInfo = vk::PipelineVertexInputStateCreateInfo({}, 1, bindingDesc.data(), vertexAttributeDescriptions.size(), vertexAttributeDescriptions.data());
-	vertShader = CompileShader("resources/shaders/orbit.vert.spv"); //Change shaders
-	fragShader = CompileShader("resources/shaders/orbit.frag.spv");
-	shaderStages[0] = vk::PipelineShaderStageCreateInfo({}, vk::ShaderStageFlagBits::eVertex, vertShader, "main");
-	shaderStages[1] = vk::PipelineShaderStageCreateInfo({}, vk::ShaderStageFlagBits::eFragment, fragShader, "main");
-	m_graphics.pipelineOrbits.pipeline = m_vulkanResources->device.createGraphicsPipeline(nullptr, pipelineInfo);
+	if (enable_orbits) {
+		//Orbit pipeline - Uses same layout as planets(ubo, texture array)- we just don't access the array in the fragment shader
+		inputAssembly.topology = vk::PrimitiveTopology::eLineStrip;
+		vertexAttributeDescriptions = { vk::VertexInputAttributeDescription(0, 0, vk::Format::eR32G32Sfloat, 0) }; //Change vertex input
+		bindingDesc = { vk::VertexInputBindingDescription(0, sizeof(glm::vec2)) };
+		vertexInputInfo = vk::PipelineVertexInputStateCreateInfo({}, 1, bindingDesc.data(), vertexAttributeDescriptions.size(), vertexAttributeDescriptions.data());
+		vertShader = CompileShader("resources/shaders/orbit.vert.spv"); //Change shaders
+		fragShader = CompileShader("resources/shaders/orbit.frag.spv");
+		shaderStages[0] = vk::PipelineShaderStageCreateInfo({}, vk::ShaderStageFlagBits::eVertex, vertShader, "main");
+		shaderStages[1] = vk::PipelineShaderStageCreateInfo({}, vk::ShaderStageFlagBits::eFragment, fragShader, "main");
+		m_graphics.pipelineOrbits.pipeline = m_vulkanResources->device.createGraphicsPipeline(nullptr, pipelineInfo);
 
-	m_vulkanResources->device.destroyShaderModule(vertShader);
-	m_vulkanResources->device.destroyShaderModule(fragShader);
+		m_vulkanResources->device.destroyShaderModule(vertShader);
+		m_vulkanResources->device.destroyShaderModule(fragShader);
+	}
 
 	//Skysphere Pipeline
 	inputAssembly.topology = vk::PrimitiveTopology::eTriangleList;
@@ -847,11 +854,111 @@ void VulkanWindow::MainLoop() {
 }
 
 void VulkanWindow::RecreateSwapchain() {
-
 	if (m_vulkanResources != nullptr) {
-		//		Cleanup();
-		//		Init();
+		spdlog::info("VulkanWindow::RecreateSwapchain");
+		m_vulkanResources->device.waitIdle();
+
+		//销毁
+		m_bufferVertex.Destroy();
+		m_bufferIndex.Destroy();
+		m_bufferInstance.Destroy();
+
+		m_vulkanResources->device.destroyQueryPool(m_queryPool);
+
+		m_graphics.uniformBuffer.Destroy();
+		m_vulkanResources->device.destroyDescriptorSetLayout(m_graphics.descriptorSetLayout);
+
+		if (enable_orbits) {
+			m_orbitVertexInfo.m_bufferVertexOrbit.Destroy();
+			m_vulkanResources->device.destroyPipeline(m_graphics.pipelineOrbits.pipeline);
+			m_vulkanResources->device.destroyPipelineLayout(m_graphics.pipelineOrbits.layout);
+		}
+		m_vulkanResources->device.destroyPipeline(m_graphics.pipelinePlanets.pipeline);
+		m_vulkanResources->device.destroyPipeline(m_graphics.pipelineSkySphere.pipeline);
+		m_vulkanResources->device.destroyPipelineLayout(m_graphics.pipelinePlanets.layout);
+		m_vulkanResources->device.destroyPipelineLayout(m_graphics.pipelineSkySphere.layout);
+
+		m_vulkanResources->device.destroySemaphore(m_graphics.semaphore);
+
+		m_compute.uniformBuffer.Destroy();
+		m_compute.commandPool.Destroy();
+		m_vulkanResources->device.destroyDescriptorSetLayout(m_compute.descriptorSetLayout);
+		m_vulkanResources->device.destroyPipeline(m_compute.pipeline);
+		m_vulkanResources->device.destroyPipelineLayout(m_compute.pipelineLayout);
+		m_vulkanResources->device.destroySemaphore(m_compute.semaphore);
+
+		spdlog::info("vulkan::cleanup");
+		m_vulkanResources->device.waitIdle();
+
+		m_vulkanResources->device.destroySampler(m_vulkanResources->depthImage.sampler);
+		m_vulkanResources->device.destroySampler(m_vulkanResources->multiSampleImage.sampler);
+
+		m_vulkanResources->device.destroyDescriptorPool(m_vulkanResources->descriptorPool);
+
+		for (auto& framebuffer : m_vulkanResources->frameBuffers) {
+			m_vulkanResources->device.destroyFramebuffer(framebuffer);
+			m_vulkanResources->frameBuffers.pop_back();
+		}
+		m_vulkanResources->device.destroyRenderPass(m_vulkanResources->renderpass);
+
+		m_vulkanResources->swapchain.Destroy();
+
+		if (enable_hide) //轨道隐藏
+			enable_orbits = !enable_orbits;
+
+		//重建
+		pickPhysicalDevice();
+		CreateSwapchain();
+		CreateRenderpass();
+		CreateFramebuffers();
+		m_sphere = SolidSphere(0.5, 20, 20);
+
+		//Setup vertex and ubo buffer for graphics
+		vko::Buffer vertexStagingBuffer = CreateBuffer(m_sphere.GetVerticesSize(), vk::BufferUsageFlagBits::eTransferSrc, m_sphere.GetVertices().data());
+		vko::Buffer indexStagingBuffer = CreateBuffer(m_sphere.GetIndiciesSize(), vk::BufferUsageFlagBits::eTransferSrc, m_sphere.GetIndicies().data());
+		m_bufferVertex = CreateBuffer(m_sphere.GetVerticesSize(), vk::BufferUsageFlagBits::eVertexBuffer | vk::BufferUsageFlagBits::eTransferDst, nullptr, vk::MemoryPropertyFlagBits::eDeviceLocal);
+		m_bufferIndex = CreateBuffer(m_sphere.GetIndiciesSize(), vk::BufferUsageFlagBits::eIndexBuffer | vk::BufferUsageFlagBits::eTransferDst, nullptr, vk::MemoryPropertyFlagBits::eDeviceLocal);
+
+
+		CopyBuffer(vertexStagingBuffer, m_bufferVertex, m_sphere.GetVerticesSize());
+		CopyBuffer(indexStagingBuffer, m_bufferIndex, m_sphere.GetIndiciesSize());
+		spdlog::info("Created Buffers");
+
+		m_graphics.uniformBuffer = CreateBuffer(sizeof(m_graphics.ubo), vk::BufferUsageFlagBits::eUniformBuffer);
+		m_graphics.uniformBuffer.Map();
+		memcpy(m_graphics.uniformBuffer.mapped, &m_graphics.ubo, sizeof(m_graphics.ubo));
+
+		vertexStagingBuffer.Destroy();
+		indexStagingBuffer.Destroy();
+
+		m_graphics.semaphore = m_vulkanResources->device.createSemaphore(vk::SemaphoreCreateInfo());
+
+
+		//Create query pool to time compute, and rendering times
+		vk::QueryPoolCreateInfo queryPoolInfo = vk::QueryPoolCreateInfo({}, vk::QueryType::eTimestamp, 2, {});
+		m_queryPool = m_vulkanResources->device.createQueryPool(queryPoolInfo);
+		m_queryResults.resize(2);
+
+		PrepareInstance();
+
+		CreateDescriptorPool();
+		CreateDescriptorSetLayout();
+		CreateDescriptorSet();
+
+		CreateGraphicsPipelineLayout();
+		CreateGraphicsPipeline();
+		PrepareCompute();
+
+		CreateCommandBuffers();
 	}
+}
+
+bool VulkanWindow::hideOrbits() {
+	enable_hide = true;
+	RecreateSwapchain();
+	enable_hide = false;
+
+	return !enable_orbits;
 }
 
 void VulkanWindow::Cleanup() {
@@ -860,7 +967,6 @@ void VulkanWindow::Cleanup() {
 	m_bufferVertex.Destroy();
 	m_bufferIndex.Destroy();
 	m_bufferInstance.Destroy();
-	m_orbitVertexInfo.m_bufferVertexOrbit.Destroy();
 
 	m_textureArrayPlanets.Destroy();
 	m_textureStarfield.Destroy();
@@ -870,11 +976,14 @@ void VulkanWindow::Cleanup() {
 	m_graphics.uniformBuffer.Destroy();
 	m_vulkanResources->device.destroyDescriptorSetLayout(m_graphics.descriptorSetLayout);
 
+	if (enable_orbits) {
+		m_orbitVertexInfo.m_bufferVertexOrbit.Destroy();
+		m_vulkanResources->device.destroyPipeline(m_graphics.pipelineOrbits.pipeline);
+		m_vulkanResources->device.destroyPipelineLayout(m_graphics.pipelineOrbits.layout);
+	}
 	m_vulkanResources->device.destroyPipeline(m_graphics.pipelinePlanets.pipeline);
-	m_vulkanResources->device.destroyPipeline(m_graphics.pipelineOrbits.pipeline);
 	m_vulkanResources->device.destroyPipeline(m_graphics.pipelineSkySphere.pipeline);
 	m_vulkanResources->device.destroyPipelineLayout(m_graphics.pipelinePlanets.layout);
-	m_vulkanResources->device.destroyPipelineLayout(m_graphics.pipelineOrbits.layout);
 	m_vulkanResources->device.destroyPipelineLayout(m_graphics.pipelineSkySphere.layout);
 
 	m_vulkanResources->device.destroySemaphore(m_graphics.semaphore);

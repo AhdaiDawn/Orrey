@@ -29,7 +29,7 @@ MainWindow::MainWindow(VulkanWindow* vwindow) :vulkanwindow(vwindow) {
 	speedSlider->setMinimum(0);
 	speedSlider->setMaximum(100);
 	speedSlider->setSingleStep(5);
-speedSlider->setTickPosition(QSlider::TicksBothSides); 
+	speedSlider->setTickPosition(QSlider::TicksBothSides);
 	speedSlider->setValue(1);
 
 	grabButton = new QPushButton(tr("&Screenshot"));
@@ -37,8 +37,12 @@ speedSlider->setTickPosition(QSlider::TicksBothSides);
 
 	quitButton = new QPushButton(tr("&Quit"));
 	quitButton->setFocusPolicy(Qt::NoFocus);
+
 	pauseButton = new QPushButton(tr("&Pause"));
 	pauseButton->setFocusPolicy(Qt::NoFocus);
+
+	hideButton = new QPushButton(tr("&HideOrbit"));
+	hideButton->setFocusPolicy(Qt::NoFocus);
 
 
 	treeWidget = new QTreeWidget();
@@ -70,9 +74,10 @@ speedSlider->setTickPosition(QSlider::TicksBothSides);
 	//	layout->addWidget(treeWidget, 1, 3);
 	layout->addWidget(FPSLcd, 1, 3);
 	layout->addWidget(speedSlider, 3, 3);
-	layout->addWidget(grabButton, 4, 3);
-	layout->addWidget(pauseButton, 5, 3);
-	layout->addWidget(quitButton, 6, 3);
+	layout->addWidget(hideButton, 4, 3);
+	layout->addWidget(grabButton, 5, 3);
+	layout->addWidget(pauseButton, 6, 3);
+	layout->addWidget(quitButton, 7, 3);
 	layout->addWidget(wrapper, 0, 0, 7, 3);
 	setLayout(layout);
 
@@ -80,7 +85,19 @@ speedSlider->setTickPosition(QSlider::TicksBothSides);
 	connect(speedSlider, &QSlider::valueChanged, this, &MainWindow::changeSpeed);
 	connect(grabButton, &QPushButton::clicked, this, &MainWindow::onGrabRequested);
 	connect(quitButton, &QPushButton::clicked, qApp, &QCoreApplication::quit);
-	connect(pauseButton, &QPushButton::clicked, vulkanwindow, &VulkanWindow::togglePaused);
+//	connect(pauseButton, &QPushButton::clicked, vulkanwindow, &VulkanWindow::togglePaused);
+	connect(pauseButton, &QPushButton::clicked, this, [=] {
+		if (vulkanwindow->togglePaused())
+			pauseButton->setText("Start");
+		else
+			pauseButton->setText("Pause");
+		});
+	connect(hideButton, &QPushButton::clicked, this, [=] {
+		if (vulkanwindow->hideOrbits())
+			hideButton->setText("ShowOrbit");
+		else
+			hideButton->setText("HideOrbit");
+		});
 
 }
 

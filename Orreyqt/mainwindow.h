@@ -33,6 +33,7 @@ private:
 	QPushButton* grabButton;
 	QPushButton* quitButton;
 	QPushButton* pauseButton;
+	QPushButton* hideButton;
 	VulkanWindow* vulkanwindow;
 	QSlider* speedSlider;
 	QTreeWidget* treeWidget;
