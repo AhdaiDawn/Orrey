@@ -245,7 +245,7 @@ void VulkanWindow::PrepareInstance()
 	objects[12] = { glm::vec4((1.8) * SCALE, 0.0f, 0.0f,	3.69432e-8), glm::vec4(0.0, 0.0, initialVelocity(1.8),		0.0),	glm::vec4(0.41, 0.41, 0.41,			1),glm::vec4(degToRad(0.0), 0.0, 0.0, 0.0),		glm::vec4(0.0f, degToRad(50.52), 0.0, 0.0), glm::vec4(objects[5].position.x, objects[5].position.y, objects[5].position.z, 5.0) };		//Ganymede
 	objects[12].orbitalTilt = glm::vec4(degToRad(-3.13), 0.0, 0.0, 0.0);
 
-	//Saturn ring
+	// Õ¡–«ª∑
 	for (int i = 13; i < SATURN_RING_OBJECT_COUNT + 13; i++)
 	{
 		glm::vec2 ring0{ 0.3 * SCALE, 0.8 * SCALE };
