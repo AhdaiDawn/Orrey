@@ -159,7 +159,7 @@ private:
 	struct
 	{
 		vko::Buffer m_bufferVertexOrbit;
-		std::vector<int> vertices;
+		std::vector<int> vertices;//¼ÇµÃpop()
 		std::vector<int> offsets;
 	} m_orbitVertexInfo;
 
