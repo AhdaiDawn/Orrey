@@ -12,7 +12,7 @@
 
 int main(int argc, char* argv[])
 {
-	QApplication a(argc, argv);
+	QApplication app(argc, argv);
 
 	VulkanWindow* vulkanwindow = new VulkanWindow();
 
@@ -21,5 +21,5 @@ int main(int argc, char* argv[])
 
 	vulkanwindow->startRender();
 
-	return a.exec();
+	return app.exec();
 }

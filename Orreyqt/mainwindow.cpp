@@ -151,7 +151,6 @@ void MainWindow::setupUI()
 void MainWindow::closeEvent(QCloseEvent*)
 {
 	qApp->quit();
-	delete vulkanwindow;
 }
 
 void MainWindow::resizeEvent(QResizeEvent*) {
@@ -160,6 +159,7 @@ void MainWindow::resizeEvent(QResizeEvent*) {
 
 MainWindow::~MainWindow()
 {
+	delete vulkanwindow;
 }
 
 void MainWindow::onGrabRequested()
