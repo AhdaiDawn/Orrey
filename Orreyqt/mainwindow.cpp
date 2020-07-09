@@ -151,7 +151,11 @@ void MainWindow::setupUI()
 void MainWindow::closeEvent(QCloseEvent*)
 {
 	qApp->quit();
-	//	delete vulkanwindow;
+	delete vulkanwindow;
+}
+
+void MainWindow::resizeEvent(QResizeEvent*) {
+	vulkanwindow->recreateSwapchain();
 }
 
 MainWindow::~MainWindow()
@@ -180,10 +184,5 @@ void MainWindow::onGrabRequested()
 void MainWindow::changeSpeed(int)
 {
 	vulkanwindow->m_speed = speedSlider->value();
-}
-
-void MainWindow::resizeEvent(QResizeEvent*)
-{
-	vulkanwindow->recreateSwapchain();
 }
 

@@ -77,22 +77,22 @@ protected:
 	uint32_t m_frameID = 0;
 	vk::SampleCountFlagBits m_msaaSamples;
 
-	uint32_t GetMemoryTypeIndex(uint32_t typeFilter, vk::MemoryPropertyFlags properties);
+	uint32_t getMemoryTypeIndex(uint32_t typeFilter, vk::MemoryPropertyFlags properties);
 
-	void CreateInstance(VulkanTools::InstanceExtenstions extensionsRequested = VulkanTools::InstanceExtenstions());
+	void createInstance(VulkanTools::InstanceExtenstions extensionsRequested = VulkanTools::InstanceExtenstions());
 	void pickPhysicalDevice();
-	void CreateSurface(VulkanWindow* window);
-	void CreateDevice(VulkanTools::DeviceExtensions extensionsRequested = VulkanTools::DeviceExtensions());
-	void CreateSwapchain();
-	void CreateRenderpass();
-	void CreateFramebuffers();
-	void CreateDebugging();
+	void createSurface(VulkanWindow* window);
+	void createDevice(VulkanTools::DeviceExtensions extensionsRequested = VulkanTools::DeviceExtensions());
+	void createSwapchain();
+	void createRenderpass();
+	void createFramebuffers();
+	void createDebugging();
 
-	void CreateCommandPool();
-	void CreateFencesAndSemaphores();
+	void createCommandPool();
+	void createFencesAndSemaphores();
 public:
-	void InitVulkan(VulkanWindow* window);
-	void Cleanup();
+	void initVulkan(VulkanWindow* window);
+	void cleanUp();
 
 	vk::DeviceMemory AllocateAndBindMemory(vk::Image image, vk::MemoryPropertyFlags memoryFlags = vk::MemoryPropertyFlagBits::eDeviceLocal, vk::MemoryAllocateInfo* allocInfoOut = nullptr);
 	vk::DeviceMemory AllocateAndBindMemory(vk::Buffer buffer, vk::MemoryPropertyFlags memoryFlags = vk::MemoryPropertyFlagBits::eDeviceLocal, vk::MemoryAllocateInfo* allocInfoOut = nullptr);

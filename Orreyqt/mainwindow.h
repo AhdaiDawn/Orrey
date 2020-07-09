@@ -33,8 +33,8 @@ public:
 	~MainWindow();
 
 private:
-	void resizeEvent(QResizeEvent* ev) override;
 	void closeEvent(QCloseEvent* e) override;
+	void resizeEvent(QResizeEvent* ev) override;
 
 	void setupUI();
 

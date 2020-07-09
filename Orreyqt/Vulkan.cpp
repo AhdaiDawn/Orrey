@@ -13,24 +13,24 @@ VKAPI_ATTR VkBool32 VKAPI_CALL debugUtilsMessengerCallback(VkDebugUtilsMessageSe
 	return VK_FALSE;
 }
 
-void Vulkan::InitVulkan(VulkanWindow* window)
+void Vulkan::initVulkan(VulkanWindow* window)
 {
 	m_vulkanResources.reset(new VulkanResources());
-	CreateInstance();
+	createInstance();
 #if _DEBUG
-	CreateDebugging();
+	createDebugging();
 #endif
 	pickPhysicalDevice();
-	CreateSurface(window);
-	CreateDevice();
-	CreateSwapchain();
-	CreateRenderpass();
-	CreateFramebuffers();
-	CreateCommandPool();
-	CreateFencesAndSemaphores();
+	createSurface(window);
+	createDevice();
+	createSwapchain();
+	createRenderpass();
+	createFramebuffers();
+	createCommandPool();
+	createFencesAndSemaphores();
 }
 
-void Vulkan::Cleanup()
+void Vulkan::cleanUp()
 {
 	spdlog::info("vulkan::cleanup");
 	m_vulkanResources->device.waitIdle();
@@ -63,7 +63,7 @@ void Vulkan::Cleanup()
 	m_vulkanResources->instance.destroy();
 }
 
-void Vulkan::CreateInstance(VulkanTools::InstanceExtenstions extensionsRequested)
+void Vulkan::createInstance(VulkanTools::InstanceExtenstions extensionsRequested)
 {
 	vk::ApplicationInfo appInfo;
 	appInfo.pApplicationName = "Orreyqt";
@@ -194,7 +194,7 @@ void Vulkan::pickPhysicalDevice() {
 	m_vulkanResources->physicalDevice.getFeatures(&features);
 }
 
-void Vulkan::CreateSurface(VulkanWindow* window)
+void Vulkan::createSurface(VulkanWindow* window)
 {
 #ifdef VK_USE_PLATFORM_WIN32_KHR
 	VkSurfaceKHR surface;
@@ -209,7 +209,7 @@ void Vulkan::CreateSurface(VulkanWindow* window)
 #endif
 }
 
-void Vulkan::CreateDevice(VulkanTools::DeviceExtensions extensionsRequested)
+void Vulkan::createDevice(VulkanTools::DeviceExtensions extensionsRequested)
 {
 	vk::DeviceCreateInfo deviceInfo;
 	float priority = 1.0f;
@@ -382,7 +382,7 @@ void Vulkan::CreateDevice(VulkanTools::DeviceExtensions extensionsRequested)
 	m_vulkanResources->queueTransfer = m_vulkanResources->device.getQueue(m_queueIDs.transfer.familyID, m_queueIDs.transfer.queueID);
 }
 
-void Vulkan::CreateSwapchain()
+void Vulkan::createSwapchain()
 {
 	//Check swapchain support
 	std::vector<vk::ExtensionProperties> deviceExtProps = m_vulkanResources->physicalDevice.enumerateDeviceExtensionProperties();
@@ -485,7 +485,7 @@ void Vulkan::CreateSwapchain()
 	spdlog::info("Created Swapchain and ImageViews");
 }
 
-void Vulkan::CreateRenderpass()
+void Vulkan::createRenderpass()
 {
 	vk::AttachmentDescription colourAttachDesc = vk::AttachmentDescription({}, m_vulkanResources->swapchain.GetSwapchainFormat());
 	colourAttachDesc.finalLayout = vk::ImageLayout::eColorAttachmentOptimal;
@@ -536,7 +536,7 @@ void Vulkan::CreateRenderpass()
 
 }
 
-void Vulkan::CreateFramebuffers()
+void Vulkan::createFramebuffers()
 {
 	vk::FramebufferCreateInfo createInfo = vk::FramebufferCreateInfo({}, m_vulkanResources->renderpass);
 	vk::Extent2D dimensions = m_vulkanResources->swapchain.GetDimensions();
@@ -555,7 +555,7 @@ void Vulkan::CreateFramebuffers()
 	spdlog::info("Created Framebuffers");
 }
 
-void Vulkan::CreateDebugging()
+void Vulkan::createDebugging()
 {
 	m_debug.vkCreateDebugUtilsMessengerEXT = (PFN_vkCreateDebugUtilsMessengerEXT)m_vulkanResources->instance.getProcAddr("vkCreateDebugUtilsMessengerEXT");
 	m_debug.vkDestroyDebugUtilsMessengerEXT = (PFN_vkDestroyDebugUtilsMessengerEXT)m_vulkanResources->instance.getProcAddr("vkDestroyDebugUtilsMessengerEXT");
@@ -569,7 +569,7 @@ void Vulkan::CreateDebugging()
 	m_debug.vkCreateDebugUtilsMessengerEXT(m_vulkanResources->instance, &debugUtilsMessengerCI, nullptr, &m_debug.debugUtilsMessenger);
 }
 
-void Vulkan::CreateCommandPool()
+void Vulkan::createCommandPool()
 {
 	m_vulkanResources->commandPool = vko::VulkanCommandPool(m_vulkanResources->device, m_queueIDs.graphics.familyID, vk::CommandPoolCreateFlagBits::eResetCommandBuffer);
 	if (m_queueIDs.transfer.familyID == m_queueIDs.graphics.familyID)
@@ -580,7 +580,7 @@ void Vulkan::CreateCommandPool()
 	spdlog::info("Created CommandPool");
 }
 
-void Vulkan::CreateFencesAndSemaphores()
+void Vulkan::createFencesAndSemaphores()
 {
 
 	uint32_t swapchainLength = m_vulkanResources->swapchain.GetImageCount();
@@ -594,7 +594,7 @@ void Vulkan::CreateFencesAndSemaphores()
 vk::DeviceMemory Vulkan::AllocateAndBindMemory(vk::Image image, vk::MemoryPropertyFlags memoryFlags, vk::MemoryAllocateInfo* allocInfoOut)
 {
 	vk::MemoryRequirements memRequirements = m_vulkanResources->device.getImageMemoryRequirements(image);
-	vk::MemoryAllocateInfo allocInfo = vk::MemoryAllocateInfo(memRequirements.size, GetMemoryTypeIndex(memRequirements.memoryTypeBits, memoryFlags));
+	vk::MemoryAllocateInfo allocInfo = vk::MemoryAllocateInfo(memRequirements.size, getMemoryTypeIndex(memRequirements.memoryTypeBits, memoryFlags));
 	vk::DeviceMemory memoryOut = m_vulkanResources->device.allocateMemory(allocInfo);
 	m_vulkanResources->device.bindImageMemory(image, memoryOut, 0);
 	if (allocInfoOut != nullptr)
@@ -605,7 +605,7 @@ vk::DeviceMemory Vulkan::AllocateAndBindMemory(vk::Image image, vk::MemoryProper
 vk::DeviceMemory Vulkan::AllocateAndBindMemory(vk::Buffer buffer, vk::MemoryPropertyFlags memoryFlags, vk::MemoryAllocateInfo* allocInfoOut)
 {
 	vk::MemoryRequirements memRequirements = m_vulkanResources->device.getBufferMemoryRequirements(buffer);
-	vk::MemoryAllocateInfo allocInfo = vk::MemoryAllocateInfo(memRequirements.size, GetMemoryTypeIndex(memRequirements.memoryTypeBits, memoryFlags));
+	vk::MemoryAllocateInfo allocInfo = vk::MemoryAllocateInfo(memRequirements.size, getMemoryTypeIndex(memRequirements.memoryTypeBits, memoryFlags));
 	vk::DeviceMemory memoryOut = m_vulkanResources->device.allocateMemory(allocInfo);
 	m_vulkanResources->device.bindBufferMemory(buffer, memoryOut, 0);
 	if (allocInfoOut != nullptr)
@@ -613,7 +613,7 @@ vk::DeviceMemory Vulkan::AllocateAndBindMemory(vk::Buffer buffer, vk::MemoryProp
 	return memoryOut;
 }
 
-uint32_t Vulkan::GetMemoryTypeIndex(uint32_t typeFilter, vk::MemoryPropertyFlags properties)
+uint32_t Vulkan::getMemoryTypeIndex(uint32_t typeFilter, vk::MemoryPropertyFlags properties)
 {
 	vk::PhysicalDeviceMemoryProperties memProps = m_vulkanResources->physicalDevice.getMemoryProperties();
 

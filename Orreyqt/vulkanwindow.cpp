@@ -124,7 +124,7 @@ bool VulkanWindow::togglePaused() {
 }
 
 void VulkanWindow::init() {
-	InitVulkan(this);
+	initVulkan(this);
 	m_sphere = SolidSphere(0.5, 20, 20);
 
 	//Setup vertex and ubo buffer for graphics
@@ -902,9 +902,9 @@ void VulkanWindow::recreateSwapchain() {
 		//ÖØ½¨
 		spdlog::info("VulkanWindow::RecreateSwapchain recreate");
 		pickPhysicalDevice();
-		CreateSwapchain();
-		CreateRenderpass();
-		CreateFramebuffers();
+		createSwapchain();
+		createRenderpass();
+		createFramebuffers();
 		m_sphere = SolidSphere(0.5, 20, 20);
 
 
@@ -976,7 +976,7 @@ void VulkanWindow::cleanUp()
 	m_vulkanResources->device.destroyPipelineLayout(m_compute.pipelineLayout);
 	m_vulkanResources->device.destroySemaphore(m_compute.semaphore);
 
-	Vulkan::Cleanup();
+	Vulkan::cleanUp();
 
 
 }

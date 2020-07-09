@@ -21,6 +21,5 @@ int main(int argc, char* argv[])
 
 	vulkanwindow->startRender();
 
-
 	return a.exec();
 }
