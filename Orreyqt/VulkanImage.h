@@ -6,8 +6,10 @@
 #include <qdebug.h>
 #include "Types.h"
 
-namespace vko {
-	class Image {
+namespace vko
+{
+	class Image
+	{
 	private:
 		vk::Device device;
 		vk::PhysicalDevice physicalDevice;

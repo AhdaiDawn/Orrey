@@ -5,8 +5,10 @@
 #include <vulkan/vulkan.hpp>
 #include "Types.h"
 
-namespace vko {
-	class Buffer {
+namespace vko
+{
+	class Buffer
+	{
 	private:
 		vk::Device device;
 	public:
@@ -21,7 +23,7 @@ namespace vko {
 		Buffer() {};
 
 		Buffer(vk::Device device, vk::DeviceMemory memory, vk::Buffer buffer, vk::DeviceSize size, vk::BufferUsageFlags usageFlags, vk::MemoryPropertyFlags memoryPropertyFlags) :
-			device(device), memory(memory), buffer(buffer), size(size), usageFlags(usageFlags), memoryPropertyFlags(memoryPropertyFlags) 
+			device(device), memory(memory), buffer(buffer), size(size), usageFlags(usageFlags), memoryPropertyFlags(memoryPropertyFlags)
 		{
 			descriptor = vk::DescriptorBufferInfo(buffer, 0, VK_WHOLE_SIZE);
 		}

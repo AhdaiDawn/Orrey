@@ -1,5 +1,5 @@
-#include "VulkanSwapChain.h"
 #include <spdlog/spdlog.h>
+#include "VulkanSwapChain.h"
 namespace vko {
 
 	std::vector<VulkanTools::ImageResources> VulkanSwapchain::GetImages()

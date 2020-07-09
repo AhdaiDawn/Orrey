@@ -4,7 +4,8 @@
 #include <spdlog/spdlog.h>
 #include <vulkan/vulkan.hpp>
 #include "Types.h"
-namespace vko {
+namespace vko
+{
 	class VulkanSwapchain
 	{
 	private:

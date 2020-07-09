@@ -10,10 +10,6 @@
 
 class SolidSphere
 {
-private:
-	std::vector<VulkanTools::VertexInput> vertices;
-	std::vector<float> normals;
-	std::vector<uint16_t> indices;
 public:
 	SolidSphere();
 	SolidSphere(float radius, size_t stacks = 20, size_t slices = 20);
@@ -25,5 +21,11 @@ public:
 	vk::DeviceSize GetIndiciesSize() { return sizeof(indices[0]) * indices.size(); }
 	std::vector<VulkanTools::VertexInput> GetVertices() { return vertices; }
 	std::vector<uint16_t> GetIndicies() { return indices; }
+
+private:
+	std::vector<VulkanTools::VertexInput> vertices;
+	std::vector<float> normals;
+	std::vector<uint16_t> indices;
+
 };
 #endif

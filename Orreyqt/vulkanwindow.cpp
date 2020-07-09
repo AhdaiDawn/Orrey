@@ -1,10 +1,10 @@
-#include "vulkanwindow.h"
 #include <qdebug.h>
 #include <QMouseEvent>
 #include <QKeyEvent>
 #include<iostream>
 #include<memory>
 #include<cstdio>
+#include "vulkanwindow.h"
 
 #define WIDTH 1920
 #define HEIGHT 1080
@@ -528,7 +528,8 @@ void VulkanWindow::CreateGraphicsPipeline()
 	m_vulkanResources->device.destroyShaderModule(vertShader);
 	m_vulkanResources->device.destroyShaderModule(fragShader);
 
-	if (enable_orbits) {
+	if (enable_orbits)
+	{
 		//Orbit pipeline - Uses same layout as planets(ubo, texture array)- we just don't access the array in the fragment shader
 		inputAssembly.topology = vk::PrimitiveTopology::eLineStrip;
 		vertexAttributeDescriptions = { vk::VertexInputAttributeDescription(0, 0, vk::Format::eR32G32Sfloat, 0) }; //Change vertex input
@@ -930,7 +931,8 @@ void VulkanWindow::RecreateSwapchain() {
 	}
 }
 
-bool VulkanWindow::hideOrbits() {
+bool VulkanWindow::hideOrbits()
+{
 	enable_hide = true;
 	RecreateSwapchain();
 	enable_hide = false;
@@ -938,7 +940,8 @@ bool VulkanWindow::hideOrbits() {
 	return !enable_orbits;
 }
 
-void VulkanWindow::Cleanup() {
+void VulkanWindow::Cleanup()
+{
 	spdlog::info("VulkanWindow::cleanup");
 	m_vulkanResources->device.waitIdle();
 	m_bufferVertex.Destroy();
@@ -953,7 +956,8 @@ void VulkanWindow::Cleanup() {
 	m_graphics.uniformBuffer.Destroy();
 	m_vulkanResources->device.destroyDescriptorSetLayout(m_graphics.descriptorSetLayout);
 
-	if (enable_orbits) {
+	if (enable_orbits)
+	{
 		m_orbitVertexInfo.m_bufferVertexOrbit.Destroy();
 		m_vulkanResources->device.destroyPipeline(m_graphics.pipelineOrbits.pipeline);
 		m_vulkanResources->device.destroyPipelineLayout(m_graphics.pipelineOrbits.layout);

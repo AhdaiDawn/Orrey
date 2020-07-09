@@ -12,7 +12,8 @@
 #include <QtWidgets/QTreeWidget>
 #include <QtWidgets/QTextBrowser>
 
-MainWindow::MainWindow(VulkanWindow* vwindow) :vulkanwindow(vwindow) {
+MainWindow::MainWindow(VulkanWindow* vwindow) :vulkanwindow(vwindow)
+{
 	QWidget* wrapper = QWidget::createWindowContainer(vulkanwindow);
 	wrapper->setFocusPolicy(Qt::StrongFocus);
 	wrapper->setFocus();
@@ -27,7 +28,6 @@ MainWindow::MainWindow(VulkanWindow* vwindow) :vulkanwindow(vwindow) {
 	FPSLcd->setSegmentStyle(QLCDNumber::Flat);
 	FPSLcd->setStyleSheet("border: 1px solid green; color: green; background: silver;");
 	FPSLcd->display(0);
-
 
 	speedSlider = new QSlider();
 	speedSlider->setFocusPolicy(Qt::NoFocus);
@@ -65,7 +65,7 @@ MainWindow::MainWindow(VulkanWindow* vwindow) :vulkanwindow(vwindow) {
 	layout->addWidget(wrapper, 0, 0, 4, 1);
 	setLayout(layout);
 
-	settingUI();
+	setupUI();
 
 	connect(vulkanwindow, &VulkanWindow::updateFPSLcd, FPSLcd, [=] {FPSLcd->display(vulkanwindow->getFps()); });
 	connect(speedSlider, &QSlider::valueChanged, this, &MainWindow::changeSpeed);
@@ -86,11 +86,12 @@ MainWindow::MainWindow(VulkanWindow* vwindow) :vulkanwindow(vwindow) {
 			hideButton->setText("HideOrbit");
 		});
 
-	lastGeometry = QRect(0, 0, 1920 / 2, 1080 / 2);
+	lastGeometry = QRect(0, 0, 1050, 800);
 	this->setGeometry(lastGeometry);
 }
 
-void MainWindow::settingUI() {
+void MainWindow::setupUI()
+{
 	QFont font;
 	font.setFamily(QString::fromUtf8("\345\276\256\350\275\257\351\233\205\351\273\221"));
 	font.setPointSize(10);
@@ -147,7 +148,8 @@ void MainWindow::settingUI() {
 
 }
 
-void MainWindow::closeEvent(QCloseEvent* ) {
+void MainWindow::closeEvent(QCloseEvent*)
+{
 	qApp->quit();
 	//	delete vulkanwindow;
 }
@@ -169,16 +171,19 @@ void MainWindow::onGrabRequested()
 	filePathName += ".jpg";
 	fd.selectFile(filePathName);
 
-	if (fd.exec() == QDialog::Accepted) {
+	if (fd.exec() == QDialog::Accepted)
+	{
 		screen->grabWindow(vulkanwindow->winId()).save(fd.selectedFiles().first());
 	}
 }
 
-void MainWindow::changeSpeed(int ) {
+void MainWindow::changeSpeed(int)
+{
 	vulkanwindow->m_speed = speedSlider->value();
 }
 
-void MainWindow::resizeEvent(QResizeEvent* ) {
+void MainWindow::resizeEvent(QResizeEvent*)
+{
 	vulkanwindow->RecreateSwapchain();
 }
 

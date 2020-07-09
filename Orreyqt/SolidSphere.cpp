@@ -40,7 +40,7 @@ SolidSphere::SolidSphere(float radius, size_t stacks, size_t slices)		//Create t
 		indices.push_back(uint16_t(i + slices + 1));
 		indices.push_back(uint16_t(i));
 		indices.push_back(uint16_t(i + 1));
-	}	
+	}
 }
 
 SolidSphere::~SolidSphere()
@@ -56,8 +56,8 @@ vk::VertexInputBindingDescription SolidSphere::GetVertexBindingDescription()
 std::vector<vk::VertexInputAttributeDescription> SolidSphere::GetVertexAttributeDescription()
 {
 	return std::vector<vk::VertexInputAttributeDescription>{
-						vk::VertexInputAttributeDescription(0, 0, vk::Format::eR32G32B32Sfloat, offsetof(VulkanTools::VertexInput, pos)),
-						vk::VertexInputAttributeDescription(1, 0, vk::Format::eR32G32B32A32Sfloat, offsetof(VulkanTools::VertexInput, colour)),
-						vk::VertexInputAttributeDescription(2, 0, vk::Format::eR32G32B32Sfloat, offsetof(VulkanTools::VertexInput, uv))
+		vk::VertexInputAttributeDescription(0, 0, vk::Format::eR32G32B32Sfloat, offsetof(VulkanTools::VertexInput, pos)),
+			vk::VertexInputAttributeDescription(1, 0, vk::Format::eR32G32B32A32Sfloat, offsetof(VulkanTools::VertexInput, colour)),
+			vk::VertexInputAttributeDescription(2, 0, vk::Format::eR32G32B32Sfloat, offsetof(VulkanTools::VertexInput, uv))
 	};
 }

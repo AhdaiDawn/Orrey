@@ -4,7 +4,8 @@
 
 #include <vulkan/vulkan.hpp>
 
-namespace vko {
+namespace vko
+{
 	class VulkanCommandPool
 	{
 	private:

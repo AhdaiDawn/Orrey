@@ -10,7 +10,8 @@
 #include <QTimer>
 #include "Vulkan.h"
 
-class VulkanWindow : public QWindow, private Vulkan {
+class VulkanWindow : public QWindow, private Vulkan
+{
 	Q_OBJECT
 
 public slots:
@@ -41,7 +42,8 @@ public:
 
 	int getFps() { return static_cast<int>(1.f / m_frameTime); }
 
-	struct {
+	struct
+	{
 		glm::vec2 mousePos = glm::vec2();
 		float zoom = -50.0f;
 		float rotationSpeed = 7.5f;
@@ -65,11 +67,11 @@ public:
 
 private:
 
-	double xPos, yPos;
+	double xPos=0, yPos=0;
 	bool m_mouse_pressed = false;
 	bool m_key_pressed = false;
-	bool enable_hide=false; 
-	bool enable_orbits=true; 
+	bool enable_hide = false;
+	bool enable_orbits = true;
 
 	QTimer* m_timer;
 	SolidSphere m_sphere;
@@ -85,8 +87,10 @@ private:
 		vk::Pipeline pipeline;
 	};
 
-	struct {
-		struct {
+	struct
+	{
+		struct
+		{
 			glm::mat4 projection;
 			glm::mat4 model;
 			glm::mat4 view;
@@ -102,7 +106,8 @@ private:
 		vk::Semaphore semaphore;
 	} m_graphics;
 
-	struct {
+	struct
+	{
 		vko::Buffer uniformBuffer;
 		vko::VulkanCommandPool commandPool;
 		vk::CommandBuffer cmdBuffer;
@@ -111,7 +116,8 @@ private:
 		vk::PipelineLayout pipelineLayout;
 		vk::Pipeline pipeline;
 		vk::Semaphore semaphore;
-		struct {
+		struct
+		{
 			float deltaT;
 			int32_t objectCount;
 			int32_t scale;
@@ -119,7 +125,8 @@ private:
 		} ubo;
 	} m_compute;
 
-	struct CelestialObj {
+	struct CelestialObj
+	{
 		glm::vec4 position; //xyz Position, w Mass
 		glm::vec4 velocity; //xyz Velocity
 		glm::vec4 scale;	//xyz Scale w texIndex
@@ -130,7 +137,8 @@ private:
 		glm::vec4 colourTint = glm::vec4(1.0);
 	};
 
-	struct {
+	struct
+	{
 		vko::Buffer m_bufferVertexOrbit;
 		std::vector<int> vertices;
 		std::vector<int> offsets;

@@ -36,7 +36,7 @@ private:
 	void resizeEvent(QResizeEvent* ev) override;
 	void closeEvent(QCloseEvent* e) override;
 
-	void settingUI();
+	void setupUI();
 
 	QLCDNumber* FPSLcd;
 	QPushButton* grabButton;

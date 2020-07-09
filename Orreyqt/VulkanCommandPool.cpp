@@ -1,5 +1,6 @@
 #include "VulkanCommandPool.h"
-namespace vko {
+namespace vko
+{
 
 	vk::CommandBuffer VulkanCommandPool::AllocateCommandBuffer()
 	{
