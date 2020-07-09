@@ -943,10 +943,13 @@ void VulkanWindow::recreateSwapchain() {
 
 		//ÖØ½¨
 		spdlog::info("VulkanWindow::RecreateSwapchain recreate");
+
 		pickPhysicalDevice();
 		createSwapchain();
 		createRenderpass();
 		createFramebuffers();
+
+		m_graphics.ubo.projection = glm::perspective(glm::radians(60.0f), m_vulkanResources->swapchain.GetDimensions().width / (float)m_vulkanResources->swapchain.GetDimensions().height, 0.1f, std::numeric_limits<float>::max());
 		m_sphere = SolidSphere(0.5, 20, 20);
 
 

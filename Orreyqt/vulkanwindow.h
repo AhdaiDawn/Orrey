@@ -32,6 +32,9 @@ public:
 	void keyPressEvent(QKeyEvent*) override;
 	void keyReleaseEvent(QKeyEvent*) override;
 	void wheelEvent(QWheelEvent*) override;
+//	void resizeEvent(QResizeEvent* ev) override {
+//		spdlog::info("Image extent: {} {}", this->width(), this->height());
+//	}
 
 	void startRender();
 	void init();
