@@ -2,7 +2,10 @@
 #ifndef VULKANBUFFER_H
 #define VULKANBUFFER_H
 
+#pragma warning(push)
+#pragma warning(disable: 26812)
 #include <vulkan/vulkan.hpp>
+#pragma warning(pop)
 #include "Types.h"
 
 namespace vko

@@ -2,7 +2,10 @@
 #ifndef VULKANIMAGE_H
 #define VULKANIMAGE_H
 
+#pragma warning(push)
+#pragma warning(disable: 26812)
 #include <vulkan/vulkan.hpp>
+#pragma warning(pop)
 #include <qdebug.h>
 #include "Types.h"
 

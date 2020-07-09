@@ -5,7 +5,10 @@
 #include <sstream>
 #include <iostream>
 #define VK_USE_PLATFORM_WIN32_KHR
+#pragma warning(push)
+#pragma warning(disable: 26812)
 #include <vulkan/vulkan.hpp>
+#pragma warning(pop)
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include <glm/glm.hpp>
@@ -14,7 +17,13 @@
 
 #define STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_STATIC
+#pragma warning(push)
+#pragma warning(disable: 6385)
+#pragma warning(disable: 6011)
+#pragma warning(disable: 6262)
+#pragma warning(disable: 6308)
 #include <stb/stb_image.h>
+#pragma warning(pop)
 
 //#include "vulkanwindow.h"
 #include "VulkanSwapchain.h"

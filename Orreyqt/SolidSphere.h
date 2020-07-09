@@ -5,7 +5,12 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include <vector>
+
+#pragma warning(push)
+#pragma warning(disable: 26812)
 #include <vulkan/vulkan.hpp>
+#pragma warning(pop)
+
 #include "Types.h"
 
 class SolidSphere

@@ -2,7 +2,10 @@
 #ifndef VKSWAPCHAIN_H
 #define VKSWAPCHAIN_H
 #include <spdlog/spdlog.h>
+#pragma warning(push)
+#pragma warning(disable: 26812)
 #include <vulkan/vulkan.hpp>
+#pragma warning(pop)
 #include "Types.h"
 namespace vko
 {
