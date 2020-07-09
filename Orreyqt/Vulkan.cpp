@@ -522,6 +522,7 @@ void Vulkan::CreateRenderpass()
 	subpass.pResolveAttachments = &colourAttachResolveRef;
 
 	vk::SubpassDependency dependency = vk::SubpassDependency();
+	dependency.dependencyFlags = vk::DependencyFlagBits::eByRegion;
 	dependency.srcStageMask = vk::PipelineStageFlagBits::eColorAttachmentOutput;
 	dependency.dstStageMask = vk::PipelineStageFlagBits::eColorAttachmentOutput;
 	dependency.dstAccessMask = vk::AccessFlagBits::eColorAttachmentRead | vk::AccessFlagBits::eColorAttachmentWrite;
