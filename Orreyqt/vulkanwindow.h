@@ -19,6 +19,8 @@ public slots:
 
 signals:
 	void updateFPSLcd(int);
+	void updateObjectSizeLCD(int);
+	void updateAstroidObjectNumLCD(int);
 
 public:
 	VulkanWindow();
@@ -39,6 +41,12 @@ public:
 	bool hideOrbits();
 	void updateMouseCamera(float xPos, float yPos, float deltaTime);
 	void updateKeyCamera(float deltaTime);
+	void addAstroidObjectNum();
+	void subAstroidObjectNum();
+	int getObjectNum();
+	void addObjectSize();
+	void subObjectSize();
+	int getObjectSize() { return object_scale; }
 
 	int getFps() { return static_cast<int>(1.f / m_frameTime); }
 
@@ -69,6 +77,13 @@ public:
 private:
 
 	double xPos = 0, yPos = 0;
+
+
+	int objects_per_group = 512;  //小行星每组多少个
+	int saturn_ring_object_count = 1000; //木星环的数量 3000
+	int astroid_belt_max_object_count = 600; //小行星环个数 250000
+	int object_scale = 15; //缩放 5-30 step 5
+
 	bool m_mouse_pressed = false;
 	bool m_key_pressed = false;
 	bool enable_hide = false;

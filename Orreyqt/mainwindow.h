@@ -38,17 +38,28 @@ private:
 
 	void setupUI();
 
+	VulkanWindow* vulkanwindow;
 	QLCDNumber* FPSLcd;
 	QPushButton* grabButton;
 	QPushButton* quitButton;
 	QPushButton* pauseButton;
 	QPushButton* hideButton;
-	VulkanWindow* vulkanwindow;
 	QSlider* speedSlider;
 	QTreeWidget* treeWidget;
 	QTextBrowser* textBrowser;
+	QLabel* FPSLabel;
+	QPushButton* addNumButton;
+	QPushButton* subSizeButton;
+	QPushButton* addSizeButton;
+	QLCDNumber* planetSizeLcd;
+	QLabel* speedLabel;
+	QLabel* planetSizeLabel;
+	QPushButton* subNumButton;
+	QLabel* astroidNumlabel;
+	QLCDNumber* astroidNumLcd;
 
 	QRect lastGeometry;
+	int lastFPS=0;
 };
 
 #endif

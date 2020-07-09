@@ -10,11 +10,6 @@
 #define HEIGHT 1080
 #define FULLSCREEN false
 
-#define OBJECTS_PER_GROUP 512
-#define SATURN_RING_OBJECT_COUNT 6000
-#define ASTROID_BELT_MAX_OBJECT_COUNT 250000
-#define SCALE 30
-
 VulkanWindow::VulkanWindow()
 {
 	m_timer = new QTimer(this);
@@ -210,8 +205,8 @@ void VulkanWindow::PrepareInstance()
 	std::default_random_engine rndGenerator((unsigned)time(nullptr));
 	std::uniform_real_distribution<float> uniformDist(0.0, 1.0);
 
-	int objectsToSpawn = 13 + SATURN_RING_OBJECT_COUNT + ASTROID_BELT_MAX_OBJECT_COUNT;
-	while (objectsToSpawn % OBJECTS_PER_GROUP != 0) //Reduce astroid count until it divides nicely with objects per group
+	int objectsToSpawn = 13 + saturn_ring_object_count + astroid_belt_max_object_count;
+	while (objectsToSpawn % objects_per_group != 0) //Reduce astroid count until it divides nicely with objects per group
 		objectsToSpawn--;
 
 	//Converted G constant for AU/SM, T: 1s ~= 1 earth sidereal day
@@ -222,39 +217,39 @@ void VulkanWindow::PrepareInstance()
 	objects.resize(objectsToSpawn);
 	objects[0] = { glm::vec4(0.0f, 0.0f, 0.0f, 1.0f), glm::vec4(0.0, 0.0, 0.0, 0.0), glm::vec4(5, 5, 5, 0), glm::vec4(degToRad(-7.25), 0.0, 0.0, 0.0),	glm::vec4(0.0f, degToRad(15.228), 0.0, 0.0) }; //Sun
 	//				Distance in AU						 Mass in Solar Mass,				Velocity in AU					Scale as ratio of Earth			Texture index   Rotation in degrees					Rotation Speed 
-	objects[1] = { glm::vec4(0.39 * SCALE, 0.0f, 0.0f, 1.651502e-7),	glm::vec4(0.0, 0.0,	initialVelocity(0.39),	0.0),	glm::vec4(0.37, 0.37, 0.37,			1),	glm::vec4(degToRad(-0.01), 0.0, 0.0, 0.0),	glm::vec4(0.0f, degToRad(6.12), 0.0, 0.0) }; //Mercury
-	objects[2] = { glm::vec4(0.723 * SCALE, 0.0f, 0.0f, 2.447225e-6),	glm::vec4(0.0, 0.0, initialVelocity(0.723), 0.0),	glm::vec4(0.949, 0.949, 0.949,		2), glm::vec4(degToRad(-117.4), 0.0, 0.0, 0.0),	glm::vec4(0.0f, degToRad(-1.476), 0.0, 0.0) }; //Venus
-	objects[3] = { glm::vec4(1.0 * SCALE, 0.0f, 0.0f, 3.0027e-6),	glm::vec4(0.0, 0.0, initialVelocity(1.0),	0.0),	glm::vec4(1.0, 1.0, 1.0,			3), glm::vec4(degToRad(-23.5), 0.0, 0.0, 0.0),	glm::vec4(0.0f, degToRad(360), 0.0, 0.0) }; //Earth
-	objects[4] = { glm::vec4(1.524 * SCALE, 0.0f, 0.0f, 3.212921e-7),	glm::vec4(0.0, 0.0, initialVelocity(1.524), 0.0),	glm::vec4(0.532, 0.532, 0.532,		4), glm::vec4(degToRad(-25.19), 0.0, 0.0, 0.0),	glm::vec4(0.0f, degToRad(345.6), 0.0, 0.0) }; //Mars
-	objects[5] = { glm::vec4(5.2 * SCALE, 0.0f, 0.0f, 9.543e-4),		glm::vec4(0.0, 0.0, initialVelocity(5.2),	0.0),	glm::vec4(10.97, 10.97, 10.97,		5), glm::vec4(degToRad(-3.13), 0.0, 0.0, 0.0),	glm::vec4(0.0f, degToRad(864), 0.0, 0.0) }; //Jupiter
-	objects[6] = { glm::vec4(9.5 * SCALE, 0.0f, 0.0f, 2.857e-4),		glm::vec4(0.0, 0.0, initialVelocity(9.5),	0.0),	glm::vec4(9.14, 9.14, 9.14,			6), glm::vec4(degToRad(-26.73), 0.0, 0.0, 0.0),	glm::vec4(0.0f, degToRad(785.448), 0.0, 0.0) }; //Saturn
-	objects[7] = { glm::vec4(19.2 * SCALE, 0.0f, 0.0f, 4.365e-5),		glm::vec4(0.0, 0.0, initialVelocity(19.2),	0.0),	glm::vec4(3.98, 3.98, 3.98,			7), glm::vec4(degToRad(-97.77), 0.0, 0.0, 0.0),	glm::vec4(0.0f, degToRad(-508.248), 0.0, 0.0) }; //Uranus
-	objects[8] = { glm::vec4(30.0 * SCALE, 0.0f, 0.0f, 5.149e-5),		glm::vec4(0.0, 0.0, initialVelocity(30.0),	0.0),	glm::vec4(3.86, 3.86, 3.86,			8), glm::vec4(degToRad(-28.32), 0.0, 0.0, 0.0),	glm::vec4(0.0f, degToRad(540), 0.0, 0.0) }; //Neptune
+	objects[1] = { glm::vec4(0.39 * object_scale, 0.0f, 0.0f, 1.651502e-7),	glm::vec4(0.0, 0.0,	initialVelocity(0.39),	0.0),	glm::vec4(0.37, 0.37, 0.37,			1),	glm::vec4(degToRad(-0.01), 0.0, 0.0, 0.0),	glm::vec4(0.0f, degToRad(6.12), 0.0, 0.0) }; //Mercury
+	objects[2] = { glm::vec4(0.723 * object_scale, 0.0f, 0.0f, 2.447225e-6),	glm::vec4(0.0, 0.0, initialVelocity(0.723), 0.0),	glm::vec4(0.949, 0.949, 0.949,		2), glm::vec4(degToRad(-117.4), 0.0, 0.0, 0.0),	glm::vec4(0.0f, degToRad(-1.476), 0.0, 0.0) }; //Venus
+	objects[3] = { glm::vec4(1.0 * object_scale, 0.0f, 0.0f, 3.0027e-6),	glm::vec4(0.0, 0.0, initialVelocity(1.0),	0.0),	glm::vec4(1.0, 1.0, 1.0,			3), glm::vec4(degToRad(-23.5), 0.0, 0.0, 0.0),	glm::vec4(0.0f, degToRad(360), 0.0, 0.0) }; //Earth
+	objects[4] = { glm::vec4(1.524 * object_scale, 0.0f, 0.0f, 3.212921e-7),	glm::vec4(0.0, 0.0, initialVelocity(1.524), 0.0),	glm::vec4(0.532, 0.532, 0.532,		4), glm::vec4(degToRad(-25.19), 0.0, 0.0, 0.0),	glm::vec4(0.0f, degToRad(345.6), 0.0, 0.0) }; //Mars
+	objects[5] = { glm::vec4(5.2 * object_scale, 0.0f, 0.0f, 9.543e-4),		glm::vec4(0.0, 0.0, initialVelocity(5.2),	0.0),	glm::vec4(10.97, 10.97, 10.97,		5), glm::vec4(degToRad(-3.13), 0.0, 0.0, 0.0),	glm::vec4(0.0f, degToRad(864), 0.0, 0.0) }; //Jupiter
+	objects[6] = { glm::vec4(9.5 * object_scale, 0.0f, 0.0f, 2.857e-4),		glm::vec4(0.0, 0.0, initialVelocity(9.5),	0.0),	glm::vec4(9.14, 9.14, 9.14,			6), glm::vec4(degToRad(-26.73), 0.0, 0.0, 0.0),	glm::vec4(0.0f, degToRad(785.448), 0.0, 0.0) }; //Saturn
+	objects[7] = { glm::vec4(19.2 * object_scale, 0.0f, 0.0f, 4.365e-5),		glm::vec4(0.0, 0.0, initialVelocity(19.2),	0.0),	glm::vec4(3.98, 3.98, 3.98,			7), glm::vec4(degToRad(-97.77), 0.0, 0.0, 0.0),	glm::vec4(0.0f, degToRad(-508.248), 0.0, 0.0) }; //Uranus
+	objects[8] = { glm::vec4(30.0 * object_scale, 0.0f, 0.0f, 5.149e-5),		glm::vec4(0.0, 0.0, initialVelocity(30.0),	0.0),	glm::vec4(3.86, 3.86, 3.86,			8), glm::vec4(degToRad(-28.32), 0.0, 0.0, 0.0),	glm::vec4(0.0f, degToRad(540), 0.0, 0.0) }; //Neptune
 
 	//Moons
-	objects[9] = { glm::vec4((0.15) * SCALE, 0.0f, 0.0f, 3.69432e-8), glm::vec4(0.0, 0.0, initialVelocity(0.15),		0.0),	glm::vec4(0.27, 0.27, 0.27,			9), glm::vec4(degToRad(-1.5), 0.0, 0.0, 0.0),	glm::vec4(0.0f, degToRad(13.33), 0.0, 0.0), glm::vec4(objects[3].position.x, objects[3].position.y, objects[3].position.z, 3.0) };		//Moon
+	objects[9] = { glm::vec4((0.15) * object_scale, 0.0f, 0.0f, 3.69432e-8), glm::vec4(0.0, 0.0, initialVelocity(0.15),		0.0),	glm::vec4(0.27, 0.27, 0.27,			9), glm::vec4(degToRad(-1.5), 0.0, 0.0, 0.0),	glm::vec4(0.0f, degToRad(13.33), 0.0, 0.0), glm::vec4(objects[3].position.x, objects[3].position.y, objects[3].position.z, 3.0) };		//Moon
 	objects[9].orbitalTilt = glm::vec4(degToRad(5.14), 0.0, 0.0, 0.0);
 
-	objects[10] = { glm::vec4((2.2) * SCALE, 0.0f, 0.0f,	3.69432e-8), glm::vec4(0.0, 0.0, initialVelocity(2.2),		0.0),	glm::vec4(0.4, 0.4, 0.4,			6),glm::vec4(degToRad(0.0), 0.0, 0.0, 0.0),		glm::vec4(0.0f, degToRad(22.5), 0.0, 0.0), glm::vec4(objects[6].position.x, objects[6].position.y, objects[6].position.z, 6.0) };		//Titan
+	objects[10] = { glm::vec4((2.2) * object_scale, 0.0f, 0.0f,	3.69432e-8), glm::vec4(0.0, 0.0, initialVelocity(2.2),		0.0),	glm::vec4(0.4, 0.4, 0.4,			6),glm::vec4(degToRad(0.0), 0.0, 0.0, 0.0),		glm::vec4(0.0f, degToRad(22.5), 0.0, 0.0), glm::vec4(objects[6].position.x, objects[6].position.y, objects[6].position.z, 6.0) };		//Titan
 	objects[10].colourTint = glm::vec4(0.9, 0.89, 0.36, 1.0);
 	objects[10].orbitalTilt = glm::vec4(degToRad(-26.73), 0.0, 0.0, 0.0);
 
-	objects[11] = { glm::vec4((1.5) * SCALE, 0.0f, 0.0f,	3.69432e-8), glm::vec4(0.0, 0.0, initialVelocity(1.5),		0.0),	glm::vec4(0.12, 0.12, 0.12,			1),glm::vec4(degToRad(0.0), 0.0, 0.0, 0.0),		glm::vec4(0.0f, degToRad(80.0), 0.0, 0.0), glm::vec4(objects[6].position.x, objects[6].position.y, objects[6].position.z, 6.0) };		//Rhea
+	objects[11] = { glm::vec4((1.5) * object_scale, 0.0f, 0.0f,	3.69432e-8), glm::vec4(0.0, 0.0, initialVelocity(1.5),		0.0),	glm::vec4(0.12, 0.12, 0.12,			1),glm::vec4(degToRad(0.0), 0.0, 0.0, 0.0),		glm::vec4(0.0f, degToRad(80.0), 0.0, 0.0), glm::vec4(objects[6].position.x, objects[6].position.y, objects[6].position.z, 6.0) };		//Rhea
 	objects[11].orbitalTilt = glm::vec4(degToRad(-26.73), 0.0, 0.0, 0.0);
 
-	objects[12] = { glm::vec4((1.8) * SCALE, 0.0f, 0.0f,	3.69432e-8), glm::vec4(0.0, 0.0, initialVelocity(1.8),		0.0),	glm::vec4(0.41, 0.41, 0.41,			1),glm::vec4(degToRad(0.0), 0.0, 0.0, 0.0),		glm::vec4(0.0f, degToRad(50.52), 0.0, 0.0), glm::vec4(objects[5].position.x, objects[5].position.y, objects[5].position.z, 5.0) };		//Ganymede
+	objects[12] = { glm::vec4((1.8) * object_scale, 0.0f, 0.0f,	3.69432e-8), glm::vec4(0.0, 0.0, initialVelocity(1.8),		0.0),	glm::vec4(0.41, 0.41, 0.41,			1),glm::vec4(degToRad(0.0), 0.0, 0.0, 0.0),		glm::vec4(0.0f, degToRad(50.52), 0.0, 0.0), glm::vec4(objects[5].position.x, objects[5].position.y, objects[5].position.z, 5.0) };		//Ganymede
 	objects[12].orbitalTilt = glm::vec4(degToRad(-3.13), 0.0, 0.0, 0.0);
 
 	// 土星环
-	for (int i = 13; i < SATURN_RING_OBJECT_COUNT + 13; i++)
+	for (int i = 13; i < saturn_ring_object_count + 13; i++)
 	{
-		glm::vec2 ring0{ 0.3 * SCALE, 0.8 * SCALE };
+		glm::vec2 ring0{ 0.3 * object_scale, 0.8 * object_scale };
 		float rho, theta;
 		rho = sqrt((pow(ring0[1], 2.0f) - pow(ring0[0], 2.0f)) * uniformDist(rndGenerator) + pow(ring0[0], 2.0f));
 		theta = 2.0 * M_PI * uniformDist(rndGenerator);
 		objects[i].position = glm::vec4(rho * cos(theta), uniformDist(rndGenerator) * 0.5f - 0.25f, rho * sin(theta), 3.69432e-32);
 		float r = sqrt(pow(objects[i].position.x, 2) + pow(objects[i].position.z, 2));
-		float vel = initialVelocity(r / SCALE); //Velocity calculation needs to be in unscaled AU
+		float vel = initialVelocity(r / object_scale); //速度计算需要在未缩放的AU中
 
 		float mag = sqrt(glm::dot(objects[i].position, objects[i].position));
 		glm::vec3 normalisedPos = glm::vec3(objects[i].position.x / mag, objects[i].position.y, objects[i].position.z / mag);
@@ -269,16 +264,16 @@ void VulkanWindow::PrepareInstance()
 		objects[i].colourTint = glm::vec4(colourTint, colourTint, colourTint, 1.0);
 	}
 
-	//Astroid belt
-	for (int i = SATURN_RING_OBJECT_COUNT + 13; i < objectsToSpawn; i++)
+	//小行星带
+	for (int i = saturn_ring_object_count + 13; i < objectsToSpawn; i++)
 	{
-		glm::vec2 ring0{ 2 * SCALE, 3 * SCALE };
+		glm::vec2 ring0{ 2 * object_scale, 3 * object_scale };
 		float rho, theta;
 		rho = sqrt((pow(ring0[1], 2.0f) - pow(ring0[0], 2.0f)) * uniformDist(rndGenerator) + pow(ring0[0], 2.0f));
 		theta = 2.0 * M_PI * uniformDist(rndGenerator);
 		objects[i].position = glm::vec4(rho * cos(theta), uniformDist(rndGenerator) * 0.5f - 0.25f, rho * sin(theta), 3.69432e-32);
 		float r = sqrt(pow(objects[i].position.x, 2) + pow(objects[i].position.z, 2));
-		float vel = initialVelocity(r / SCALE);
+		float vel = initialVelocity(r / object_scale);
 
 		float mag = sqrt(glm::dot(objects[i].position, objects[i].position));
 		glm::vec3 normalisedPos = glm::vec3(objects[i].position.x / mag, objects[i].position.y, objects[i].position.z / mag);
@@ -301,7 +296,7 @@ void VulkanWindow::PrepareInstance()
 	//CopyBuffer(instanceStagingBuffer, m_bufferInstance, size);
 	cmdBuffer.copyBuffer(instanceStagingBuffer.buffer, m_bufferInstance.buffer, vk::BufferCopy(0, 0, size));
 
-	//Give compute queue ownership of the instance buffer so it's ready for the render loop
+	//提供实例缓冲区的计算队列所有权，以便为渲染循环做好准备
 	if (m_queueIDs.graphics.familyID != m_queueIDs.compute.familyID)
 	{
 		InsertBufferMemoryBarrier(cmdBuffer, m_bufferInstance,
@@ -323,19 +318,19 @@ void VulkanWindow::PrepareInstance()
 	instanceStagingBuffer.Destroy();
 
 	if (enable_orbits) {
-		//Roughly calculate the orbits for drawing
+		//大致计算绘制的轨道
 		std::vector<glm::vec2> allPoints;
 		int offset = 0;
 		for (int i = 1; i < 9; i++)
 		{
-			std::vector<glm::vec2> points = CalculateOrbitPoints(objects[i].position, objects[i].velocity, G, 0.5 * (objects[i].position.x / SCALE));
+			std::vector<glm::vec2> points = CalculateOrbitPoints(objects[i].position, objects[i].velocity, G, 0.5 * (objects[i].position.x / object_scale));
 			allPoints.insert(allPoints.end(), points.begin(), points.end());
 			m_orbitVertexInfo.offsets.push_back(offset);
 			offset += points.size();
 			m_orbitVertexInfo.vertices.push_back(points.size());
 		}
 
-		//Copy orbit data into its vertex buffer (drawn as lines)
+		//将轨道数据复制到其顶点缓冲区（绘制为线）
 		vko::Buffer vertexStagingBuffer = CreateBuffer(allPoints.size() * sizeof(glm::vec2), vk::BufferUsageFlagBits::eTransferSrc, allPoints.data());
 		m_orbitVertexInfo.m_bufferVertexOrbit = CreateBuffer(allPoints.size() * sizeof(glm::vec2), vk::BufferUsageFlagBits::eVertexBuffer | vk::BufferUsageFlagBits::eTransferDst, nullptr, vk::MemoryPropertyFlagBits::eDeviceLocal);
 
@@ -625,6 +620,46 @@ void VulkanWindow::updateKeyCamera(float deltaTime) {
 
 }
 
+
+void VulkanWindow::addAstroidObjectNum()
+{
+	if (astroid_belt_max_object_count < 500000) {
+		astroid_belt_max_object_count *= 2;
+		emit updateAstroidObjectNumLCD(astroid_belt_max_object_count);
+		recreateSwapchain();
+	}
+}
+
+void VulkanWindow::subAstroidObjectNum()
+{
+	if (astroid_belt_max_object_count > 1024) {
+		astroid_belt_max_object_count /= 2;
+		emit updateAstroidObjectNumLCD(astroid_belt_max_object_count);
+		recreateSwapchain();
+	}
+}
+
+int VulkanWindow::getObjectNum() {
+	return m_compute.ubo.objectCount;
+}
+
+void VulkanWindow::addObjectSize() {
+	if (object_scale > 5) {
+		object_scale -= 5;
+		emit  updateObjectSizeLCD(object_scale);
+		recreateSwapchain();
+	}
+
+}
+
+void VulkanWindow::subObjectSize() {
+	if (object_scale < 30) {
+		object_scale += 5;
+		emit  updateObjectSizeLCD(object_scale);
+		recreateSwapchain();
+	}
+}
+
 void VulkanWindow::UpdateCameraUniformBuffer()
 {
 	//	位移
@@ -659,7 +694,7 @@ void VulkanWindow::PrepareCompute()
 	//Compute Uniform buffer
 	m_compute.uniformBuffer = CreateBuffer(sizeof(m_compute.ubo), vk::BufferUsageFlagBits::eUniformBuffer);
 	m_compute.ubo.objectCount = m_bufferInstance.size / sizeof(CelestialObj);
-	m_compute.ubo.scale = SCALE;
+	m_compute.ubo.scale = object_scale;
 	m_compute.uniformBuffer.Map();
 	UpdateComputeUniformBuffer();
 
@@ -689,7 +724,7 @@ void VulkanWindow::PrepareCompute()
 	vk::ShaderModule computeShader = CompileShader("resources/shaders/planets.comp.spv");
 	vk::PipelineShaderStageCreateInfo computeShaderStage = vk::PipelineShaderStageCreateInfo({}, vk::ShaderStageFlagBits::eCompute, computeShader, "main");
 
-	uint32_t objectsPerGroup = OBJECTS_PER_GROUP;
+	uint32_t objectsPerGroup = objects_per_group;
 	vk::SpecializationMapEntry specEntry = vk::SpecializationMapEntry(0, 0, sizeof(uint32_t));
 	vk::SpecializationInfo specInfo = vk::SpecializationInfo(1, &specEntry, sizeof(uint32_t), &objectsPerGroup);
 	computeShaderStage.pSpecializationInfo = &specInfo;
@@ -752,7 +787,7 @@ void VulkanWindow::CreateComputeCommandBuffer()
 	m_compute.cmdBuffer.bindDescriptorSets(vk::PipelineBindPoint::eCompute, m_compute.pipelineLayout, 0, m_compute.descriptorSet, {});
 	m_compute.cmdBuffer.resetQueryPool(m_queryPool, 0, 2);
 	m_compute.cmdBuffer.writeTimestamp(vk::PipelineStageFlagBits::eComputeShader, m_queryPool, 0);
-	m_compute.cmdBuffer.dispatch(ceil((m_bufferInstance.size / sizeof(CelestialObj)) / OBJECTS_PER_GROUP), 1, 1);
+	m_compute.cmdBuffer.dispatch(ceil((m_bufferInstance.size / sizeof(CelestialObj)) / objects_per_group), 1, 1);
 	m_compute.cmdBuffer.writeTimestamp(vk::PipelineStageFlagBits::eComputeShader, m_queryPool, 1);
 
 	InsertBufferMemoryBarrier(m_compute.cmdBuffer, m_bufferInstance,
@@ -767,9 +802,9 @@ std::vector<glm::vec2> VulkanWindow::CalculateOrbitPoints(glm::vec4 pos, glm::ve
 {
 	int plotPoints = ceil(400 / timestep) * pos.x; //This seems to work quite well
 	glm::vec3 vPos = glm::vec3(pos.x, pos.y, pos.z);
-	float xT = vPos.x / SCALE;
-	float yT = vPos.y / SCALE;
-	float zT = vPos.z / SCALE;
+	float xT = vPos.x / object_scale;
+	float yT = vPos.y / object_scale;
+	float zT = vPos.z / object_scale;
 
 	float xV = vel.x;
 	float zV = vel.z;
@@ -787,7 +822,7 @@ std::vector<glm::vec2> VulkanWindow::CalculateOrbitPoints(glm::vec4 pos, glm::ve
 		xT -= xV * timestep;
 		zT -= zV * timestep;
 
-		plotPositions.emplace_back(glm::vec2(xT * SCALE, zT * SCALE));
+		plotPositions.emplace_back(glm::vec2(xT * object_scale, zT * object_scale));
 	}
 
 	return plotPositions;
@@ -847,12 +882,13 @@ void VulkanWindow::MainLoop() {
 		//		spdlog::info("\tRuntime = {}", m_seconds);
 		m_seconds += 1;
 	}
-	//		}
 }
 
 void VulkanWindow::recreateSwapchain() {
 	if (m_vulkanResources != nullptr) {
 		spdlog::info("VulkanWindow::RecreateSwapchain");
+		//		cleanUp();
+		//		init();
 		m_vulkanResources->device.waitIdle();
 
 		//销毁
@@ -866,6 +902,12 @@ void VulkanWindow::recreateSwapchain() {
 
 		if (enable_orbits) {
 			m_orbitVertexInfo.m_bufferVertexOrbit.Destroy();
+			for (int i = 1; i < 9; i++)
+			{
+				m_orbitVertexInfo.offsets.pop_back();
+				m_orbitVertexInfo.vertices.pop_back();
+			}
+
 			m_vulkanResources->device.destroyPipeline(m_graphics.pipelineOrbits.pipeline);
 			m_vulkanResources->device.destroyPipelineLayout(m_graphics.pipelineOrbits.layout);
 		}

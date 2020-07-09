@@ -14,6 +14,9 @@
 
 MainWindow::MainWindow(VulkanWindow* vwindow) :vulkanwindow(vwindow)
 {
+
+	QGridLayout* gridLayout = new QGridLayout;
+
 	QWidget* wrapper = QWidget::createWindowContainer(vulkanwindow);
 	wrapper->setFocusPolicy(Qt::StrongFocus);
 	wrapper->setFocus();
@@ -22,52 +25,103 @@ MainWindow::MainWindow(VulkanWindow* vwindow) :vulkanwindow(vwindow)
 	sizePolicy.setVerticalStretch(1);
 	sizePolicy.setHeightForWidth(wrapper->sizePolicy().hasHeightForWidth());
 	wrapper->setSizePolicy(sizePolicy);
+	gridLayout->addWidget(wrapper, 0, 0, 9, 1);
 
-	FPSLcd = new QLCDNumber(2);
+	FPSLcd = new QLCDNumber(3);
 	FPSLcd->setSegmentStyle(QLCDNumber::Filled);
 	FPSLcd->setSegmentStyle(QLCDNumber::Flat);
 	FPSLcd->setStyleSheet("border: 1px solid green; color: green; background: silver;");
 	FPSLcd->display(0);
+	gridLayout->addWidget(FPSLcd, 3, 2, 1, 1);
+
+	FPSLabel = new QLabel();
+	gridLayout->addWidget(FPSLabel, 3, 1, 1, 1);
 
 	speedSlider = new QSlider();
 	speedSlider->setFocusPolicy(Qt::NoFocus);
 	speedSlider->setMinimum(0);
 	speedSlider->setMaximum(100);
 	speedSlider->setSingleStep(5);
-	speedSlider->setTickPosition(QSlider::TicksBothSides);
+	speedSlider->setOrientation(Qt::Horizontal);
 	speedSlider->setValue(1);
+	gridLayout->addWidget(speedSlider, 2, 2, 1, 3);
 
-	grabButton = new QPushButton(tr("&Screenshot"));
+	speedLabel = new QLabel();
+	gridLayout->addWidget(speedLabel, 2, 1, 1, 1);
+
+	grabButton = new QPushButton();
 	grabButton->setFocusPolicy(Qt::NoFocus);
+	gridLayout->addWidget(grabButton, 7, 3, 1, 2);
 
-	quitButton = new QPushButton(tr("&Quit"));
+	quitButton = new QPushButton();
 	quitButton->setFocusPolicy(Qt::NoFocus);
+	gridLayout->addWidget(quitButton, 8, 3, 1, 2);
 
-	pauseButton = new QPushButton(tr("&Pause"));
+	pauseButton = new QPushButton();
 	pauseButton->setFocusPolicy(Qt::NoFocus);
+	gridLayout->addWidget(pauseButton, 8, 1, 1, 2);
 
-	hideButton = new QPushButton(tr("&HideOrbit"));
+	hideButton = new QPushButton();
 	hideButton->setFocusPolicy(Qt::NoFocus);
+	gridLayout->addWidget(hideButton, 7, 1, 1, 2);
+
+	planetSizeLcd = new QLCDNumber(2);
+	planetSizeLcd->setSegmentStyle(QLCDNumber::Filled);
+	planetSizeLcd->setSegmentStyle(QLCDNumber::Flat);
+	planetSizeLcd->setStyleSheet("border: 1px solid green; color: green; background: silver;");
+	gridLayout->addWidget(planetSizeLcd, 4, 2, 1, 1);
+
+	subSizeButton = new QPushButton();
+	gridLayout->addWidget(subSizeButton, 6, 1, 1, 2);
+
+	addSizeButton = new QPushButton();
+	gridLayout->addWidget(addSizeButton, 5, 1, 1, 2);
+
+	planetSizeLabel = new QLabel();
+	gridLayout->addWidget(planetSizeLabel, 4, 1, 1, 1);
+
+	astroidNumlabel = new QLabel();
+	gridLayout->addWidget(astroidNumlabel, 3, 3, 1, 2);
+
+	astroidNumLcd = new QLCDNumber(6);
+	astroidNumLcd->setSegmentStyle(QLCDNumber::Filled);
+	astroidNumLcd->setSegmentStyle(QLCDNumber::Flat);
+	astroidNumLcd->setStyleSheet("border: 1px solid green; color: green; background: silver;");
+	astroidNumLcd->display(0);
+
+	gridLayout->addWidget(astroidNumLcd, 4, 3, 1, 2);
+
+	addNumButton = new QPushButton();
+	gridLayout->addWidget(addNumButton, 5, 3, 1, 2);
+
+	subNumButton = new QPushButton();
+	gridLayout->addWidget(subNumButton, 6, 3, 1, 2);
 
 	textBrowser = new QTextBrowser();
+	gridLayout->addWidget(textBrowser, 1, 1, 1, 4);
 
 	treeWidget = new QTreeWidget();
+	gridLayout->addWidget(treeWidget, 0, 1, 1, 4);
 
-	QGridLayout* layout = new QGridLayout;
-	layout->addWidget(FPSLcd, 2, 2, 2, 1);
-	layout->addWidget(treeWidget, 0, 2, 1, 3);
-	layout->addWidget(speedSlider, 0, 1, 4, 1);
-	layout->addWidget(hideButton, 2, 3, 1, 1);
-	layout->addWidget(grabButton, 2, 4, 1, 1);
-	layout->addWidget(pauseButton, 3, 3, 1, 1);
-	layout->addWidget(quitButton, 3, 4, 1, 1);
-	layout->addWidget(textBrowser, 1, 2, 1, 3);
-	layout->addWidget(wrapper, 0, 0, 4, 1);
-	setLayout(layout);
+	setLayout(gridLayout);
 
 	setupUI();
 
-	connect(vulkanwindow, &VulkanWindow::updateFPSLcd, FPSLcd, [=] {FPSLcd->display(vulkanwindow->getFps()); });
+	connect(vulkanwindow, &VulkanWindow::updateFPSLcd, FPSLcd, [=] {
+		if (abs(vulkanwindow->getFps() - lastFPS) > 10) {
+			lastFPS = vulkanwindow->getFps();
+			FPSLcd->display(vulkanwindow->getFps());
+		}
+		});
+
+	connect(addSizeButton, &QPushButton::clicked, vulkanwindow, &VulkanWindow::addObjectSize);
+	connect(subSizeButton, &QPushButton::clicked, vulkanwindow, &VulkanWindow::subObjectSize);
+	connect(vulkanwindow, &VulkanWindow::updateObjectSizeLCD, planetSizeLcd, [=] {planetSizeLcd->display(vulkanwindow->getObjectSize()); });
+
+	connect(addNumButton, &QPushButton::clicked, vulkanwindow, &VulkanWindow::addAstroidObjectNum);
+	connect(subNumButton, &QPushButton::clicked, vulkanwindow, &VulkanWindow::subAstroidObjectNum);
+	connect(vulkanwindow, &VulkanWindow::updateAstroidObjectNumLCD, astroidNumLcd, [=] {astroidNumLcd->display(vulkanwindow->getObjectNum()); });
+
 	connect(speedSlider, &QSlider::valueChanged, this, &MainWindow::changeSpeed);
 	connect(grabButton, &QPushButton::clicked, this, &MainWindow::onGrabRequested);
 	connect(quitButton, &QPushButton::clicked, qApp, &QCoreApplication::quit);
@@ -86,12 +140,50 @@ MainWindow::MainWindow(VulkanWindow* vwindow) :vulkanwindow(vwindow)
 			hideButton->setText("HideOrbit");
 		});
 
-	lastGeometry = QRect(0, 0, 1050, 800);
+	//	lastGeometry = QRect(0, 0, 2560, 1600);
+	lastGeometry = QRect(0, 0, 2500, 1500);
 	this->setGeometry(lastGeometry);
 }
 
 void MainWindow::setupUI()
 {
+	QSizePolicy sizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
+	sizePolicy.setHorizontalStretch(0);
+	sizePolicy.setVerticalStretch(0);
+	sizePolicy.setHeightForWidth(FPSLcd->sizePolicy().hasHeightForWidth());
+	FPSLcd->setSizePolicy(sizePolicy);
+
+	sizePolicy.setHeightForWidth(planetSizeLcd->sizePolicy().hasHeightForWidth());
+	planetSizeLcd->setSizePolicy(sizePolicy);
+
+	sizePolicy.setHeightForWidth(astroidNumlabel->sizePolicy().hasHeightForWidth());
+	astroidNumlabel->setSizePolicy(sizePolicy);
+
+	sizePolicy.setHeightForWidth(astroidNumLcd->sizePolicy().hasHeightForWidth());
+	astroidNumLcd->setSizePolicy(sizePolicy);
+
+	sizePolicy.setHeightForWidth(speedLabel->sizePolicy().hasHeightForWidth());
+	speedLabel->setSizePolicy(sizePolicy);
+
+	QSizePolicy sizePolicy2(QSizePolicy::Expanding, QSizePolicy::Minimum);
+	sizePolicy2.setHorizontalStretch(0);
+	sizePolicy2.setVerticalStretch(0);
+	sizePolicy2.setHeightForWidth(speedSlider->sizePolicy().hasHeightForWidth());
+	speedSlider->setSizePolicy(sizePolicy2);
+
+	FPSLabel->setText(QCoreApplication::translate("Form", "FPS\357\274\232", nullptr));
+	addNumButton->setText(QCoreApplication::translate("Form", "AddNum", nullptr));
+	subSizeButton->setText(QCoreApplication::translate("Form", "SubSize", nullptr));
+	addSizeButton->setText(QCoreApplication::translate("Form", "AddSize", nullptr));
+	hideButton->setText(QCoreApplication::translate("Form", "HideOrbit", nullptr));
+	speedLabel->setText(QCoreApplication::translate("Form", "\351\200\237\345\272\246", nullptr));
+	pauseButton->setText(QCoreApplication::translate("Form", "Pause", nullptr));
+	planetSizeLabel->setText(QCoreApplication::translate("Form", "\350\241\214\346\230\237\347\274\251\346\224\276\357\274\232", nullptr));
+	subNumButton->setText(QCoreApplication::translate("Form", "SubNum", nullptr));
+	grabButton->setText(QCoreApplication::translate("Form", "Screenshot", nullptr));
+	quitButton->setText(QCoreApplication::translate("Form", "Quit", nullptr));
+	astroidNumlabel->setText(QCoreApplication::translate("Form", "<html><head/><body><p align=\"center\">\345\260\217\350\241\214\346\230\237\346\225\260\351\207\217</p></body></html>", nullptr));
+
 	QFont font;
 	font.setFamily(QString::fromUtf8("\345\276\256\350\275\257\351\233\205\351\273\221"));
 	font.setPointSize(10);
