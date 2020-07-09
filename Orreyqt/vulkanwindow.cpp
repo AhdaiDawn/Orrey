@@ -25,11 +25,11 @@ VulkanWindow::~VulkanWindow()
 {
 	m_timer->stop();
 	delete m_timer;
-	Cleanup();
+	cleanUp();
 }
 
-void VulkanWindow::Run() {
-	Init();
+void VulkanWindow::startRender() {
+	init();
 	m_timer->start(1);
 }
 
@@ -123,8 +123,8 @@ bool VulkanWindow::togglePaused() {
 	return !(m_timer->isActive());
 }
 
-void VulkanWindow::Init() {
-	InitQVulkan(this);
+void VulkanWindow::init() {
+	InitVulkan(this);
 	m_sphere = SolidSphere(0.5, 20, 20);
 
 	//Setup vertex and ubo buffer for graphics
@@ -217,7 +217,7 @@ void VulkanWindow::PrepareInstance()
 	//Converted G constant for AU/SM, T: 1s ~= 1 earth sidereal day
 	const double G = 0.0002959122083;
 	auto initialVelocity = [G](float r, float mass = 1.0) { return sqrt((G * mass) / r);  };
-	auto degToRad = [](float deg) {return deg * M_PI / 180; };
+	auto degToRad = [](float deg) {return (float)(deg * M_PI / 180); };
 
 	objects.resize(objectsToSpawn);
 	objects[0] = { glm::vec4(0.0f, 0.0f, 0.0f, 1.0f), glm::vec4(0.0, 0.0, 0.0, 0.0), glm::vec4(5, 5, 5, 0), glm::vec4(degToRad(-7.25), 0.0, 0.0, 0.0),	glm::vec4(0.0f, degToRad(15.228), 0.0, 0.0) }; //Sun
@@ -584,7 +584,7 @@ void VulkanWindow::RenderFrame()
 	vk::SwapchainKHR swapchains[] = { m_vulkanResources->swapchain.GetVkObject() };
 	vk::PresentInfoKHR presentInfo = vk::PresentInfoKHR(1, &m_vulkanResources->semaphoreRender[m_frameID], 1, swapchains, &imageIndex.value);
 
-	vk::Result result = m_vulkanResources->queueGraphics.presentKHR(presentInfo);
+	m_vulkanResources->queueGraphics.presentKHR(presentInfo);
 	m_vulkanResources->queueGraphics.waitIdle();
 
 	//spdlog::info("\Instance draw time = {}ms", GetTimeQueryResult(m_queueIDs.graphics.timestampValidBits));
@@ -606,7 +606,7 @@ void VulkanWindow::RenderFrame()
 	m_frameID = (m_frameID + 1) % m_vulkanResources->swapchain.GetImageCount();
 }
 
-void VulkanWindow::UpdateMouseCamera(float xPos, float yPos, float deltaTime)
+void VulkanWindow::updateMouseCamera(float xPos, float yPos, float deltaTime)
 {
 	float dx = m_camera.mousePos.x - xPos;
 	float dy = m_camera.mousePos.y - yPos;
@@ -617,7 +617,7 @@ void VulkanWindow::UpdateMouseCamera(float xPos, float yPos, float deltaTime)
 	m_camera.mousePos = glm::vec2(xPos, yPos);
 }
 
-void VulkanWindow::UpdateKeyCamera(float deltaTime) {
+void VulkanWindow::updateKeyCamera(float deltaTime) {
 	if (m_camera.keys.accelerate)
 		m_speed += 5 * deltaTime;
 	if (m_camera.keys.moderate)
@@ -821,12 +821,12 @@ void VulkanWindow::MainLoop() {
 		if (m_camera.mousePos.x != xPos || m_camera.mousePos.y != yPos)
 		{
 			m_camera.viewUpdated = true;
-			UpdateMouseCamera(xPos, yPos, m_frameTime);
+			updateMouseCamera(xPos, yPos, m_frameTime);
 		}
 	}
 	if (m_key_pressed) {
 		m_camera.viewUpdated = true;
-		UpdateKeyCamera(m_frameTime);
+		updateKeyCamera(m_frameTime);
 	}
 
 	if (m_camera.viewUpdated)
@@ -850,7 +850,7 @@ void VulkanWindow::MainLoop() {
 	//		}
 }
 
-void VulkanWindow::RecreateSwapchain() {
+void VulkanWindow::recreateSwapchain() {
 	if (m_vulkanResources != nullptr) {
 		spdlog::info("VulkanWindow::RecreateSwapchain");
 		m_vulkanResources->device.waitIdle();
@@ -934,13 +934,13 @@ void VulkanWindow::RecreateSwapchain() {
 bool VulkanWindow::hideOrbits()
 {
 	enable_hide = true;
-	RecreateSwapchain();
+	recreateSwapchain();
 	enable_hide = false;
 
 	return !enable_orbits;
 }
 
-void VulkanWindow::Cleanup()
+void VulkanWindow::cleanUp()
 {
 	spdlog::info("VulkanWindow::cleanup");
 	m_vulkanResources->device.waitIdle();

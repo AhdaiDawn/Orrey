@@ -184,6 +184,6 @@ void MainWindow::changeSpeed(int)
 
 void MainWindow::resizeEvent(QResizeEvent*)
 {
-	vulkanwindow->RecreateSwapchain();
+	vulkanwindow->recreateSwapchain();
 }
 

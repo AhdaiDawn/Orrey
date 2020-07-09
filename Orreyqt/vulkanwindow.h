@@ -31,14 +31,14 @@ public:
 	void keyReleaseEvent(QKeyEvent*) override;
 	void wheelEvent(QWheelEvent*) override;
 
-	void Run();
-	void Init();
-	void Cleanup();
+	void startRender();
+	void init();
+	void cleanUp();
 	bool togglePaused();
-	void RecreateSwapchain();
+	void recreateSwapchain();
 	bool hideOrbits();
-	void UpdateMouseCamera(float xPos, float yPos, float deltaTime);
-	void UpdateKeyCamera(float deltaTime);
+	void updateMouseCamera(float xPos, float yPos, float deltaTime);
+	void updateKeyCamera(float deltaTime);
 
 	int getFps() { return static_cast<int>(1.f / m_frameTime); }
 
@@ -53,7 +53,8 @@ public:
 		glm::vec3 rotation = glm::vec3();
 		glm::vec3 position = glm::vec3();
 
-		struct {
+		struct
+		{
 			bool up = false;
 			bool down = false;
 			bool left = false;
@@ -67,7 +68,7 @@ public:
 
 private:
 
-	double xPos=0, yPos=0;
+	double xPos = 0, yPos = 0;
 	bool m_mouse_pressed = false;
 	bool m_key_pressed = false;
 	bool enable_hide = false;

@@ -1,7 +1,7 @@
 #include "Vulkan.h"
 #include "vulkanwindow.h"
 
-VKAPI_ATTR VkBool32 VKAPI_CALL debugUtilsMessengerCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData)
+VKAPI_ATTR VkBool32 VKAPI_CALL debugUtilsMessengerCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData=nullptr)
 {
 	if (messageSeverity >= VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT) {
 		spdlog::error("{}", pCallbackData->pMessage);
@@ -13,7 +13,7 @@ VKAPI_ATTR VkBool32 VKAPI_CALL debugUtilsMessengerCallback(VkDebugUtilsMessageSe
 	return VK_FALSE;
 }
 
-void Vulkan::InitQVulkan(VulkanWindow* window)
+void Vulkan::InitVulkan(VulkanWindow* window)
 {
 	m_vulkanResources.reset(new VulkanResources());
 	CreateInstance();
@@ -35,7 +35,7 @@ void Vulkan::Cleanup()
 	spdlog::info("vulkan::cleanup");
 	m_vulkanResources->device.waitIdle();
 
-	for (int i = 0; i < m_vulkanResources->swapchain.GetImageCount(); i++)
+	for (int i = 0; i < (int)m_vulkanResources->swapchain.GetImageCount(); i++)
 	{
 		m_vulkanResources->device.destroySemaphore(m_vulkanResources->semaphoreImageAquired[i]);
 		m_vulkanResources->device.destroySemaphore(m_vulkanResources->semaphoreRender[i]);
@@ -66,9 +66,9 @@ void Vulkan::Cleanup()
 void Vulkan::CreateInstance(VulkanTools::InstanceExtenstions extensionsRequested)
 {
 	vk::ApplicationInfo appInfo;
-	appInfo.pApplicationName = "OrreyVK";
+	appInfo.pApplicationName = "Orreyqt";
 	appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
-	appInfo.pEngineName = "OrreyVK";
+	appInfo.pEngineName = "Orreyqt";
 	appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
 
 	vk::InstanceCreateInfo instanceInfo;
@@ -90,7 +90,7 @@ void Vulkan::CreateInstance(VulkanTools::InstanceExtenstions extensionsRequested
 		if (!extensionsRequested.containsExtension(surfaceExtensions[i]))
 			extensionsRequested.addExtension(surfaceExtensions[i]);
 
-	uint32_t extensionCount = 0;
+//	uint32_t extensionCount = 0;
 	std::vector<vk::ExtensionProperties> supportedExtensions = vk::enumerateInstanceExtensionProperties();
 
 	if (supportedExtensions.size() == 0 && surfaceExtensions.size() != 0)
@@ -104,7 +104,7 @@ void Vulkan::CreateInstance(VulkanTools::InstanceExtenstions extensionsRequested
 
 		for (const auto& extension : supportedExtensions) {
 			spdlog::info("\t{}, {}", extension.extensionName, extension.specVersion);
-			bool foundExt = false;
+//			bool foundExt = false;
 			for (const auto& requestedExt : extensionsRequested.getExtensions()) {
 				if (!strcmp(extension.extensionName, requestedExt.c_str()))
 				{
@@ -145,7 +145,7 @@ void Vulkan::CreateInstance(VulkanTools::InstanceExtenstions extensionsRequested
 				spdlog::info("\t{}", layer);
 		}
 		instanceInfo.ppEnabledLayerNames = enabledLayers.data();
-		instanceInfo.enabledLayerCount = enabledLayers.size();
+		instanceInfo.enabledLayerCount =static_cast<uint32_t> (enabledLayers.size());
 	}
 #endif
 
@@ -155,7 +155,7 @@ void Vulkan::CreateInstance(VulkanTools::InstanceExtenstions extensionsRequested
 
 //VkPhysicalDevice 可以在VkInstance销毁时自动销毁
 void Vulkan::pickPhysicalDevice() {
-	uint32_t numPhysicalDevices = 0;
+//	uint32_t numPhysicalDevices = 0;
 	std::vector<vk::PhysicalDevice> physicalDevices = m_vulkanResources->instance.enumeratePhysicalDevices();
 	if (physicalDevices.size() == 0)
 		throw std::runtime_error("Vulkan: No physical devices found");
@@ -336,7 +336,7 @@ void Vulkan::CreateDevice(VulkanTools::DeviceExtensions extensionsRequested)
 		queueFamilyID++;
 	}
 
-	deviceInfo.queueCreateInfoCount = deviceQueues.size();
+	deviceInfo.queueCreateInfoCount =static_cast<uint32_t> (deviceQueues.size());
 	deviceInfo.pQueueCreateInfos = deviceQueues.data();
 
 	vk::PhysicalDeviceFeatures features;
@@ -358,7 +358,7 @@ void Vulkan::CreateDevice(VulkanTools::DeviceExtensions extensionsRequested)
 	for (auto& extension : deviceExtProps)
 	{
 		spdlog::info("\t{}, {}", extension.extensionName, extension.specVersion);
-		bool foundExt = false;
+//		bool foundExt = false;
 		for (const auto& requestedExt : extensionsRequested.getExtensions()) {
 			if (!strcmp(extension.extensionName, requestedExt.c_str()))
 			{
@@ -623,6 +623,7 @@ uint32_t Vulkan::GetMemoryTypeIndex(uint32_t typeFilter, vk::MemoryPropertyFlags
 			return i;
 		}
 	}
+	return 0;
 }
 
 vko::Image Vulkan::CreateImage(vk::ImageType imageType, vk::Format format, vk::Extent3D extent,
@@ -862,8 +863,8 @@ vko::Image Vulkan::Create2DTextureArray(vk::Format format, std::vector<const cha
 	};
 
 	std::vector<ImageInfo> imageInfo;
-	int width;
-	int height;
+	int width=0;
+	int height=0;
 	int channels;
 	int totalMemorySize = 0;
 

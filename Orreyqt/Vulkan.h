@@ -91,7 +91,7 @@ protected:
 	void CreateCommandPool();
 	void CreateFencesAndSemaphores();
 public:
-	void InitQVulkan(VulkanWindow* window);
+	void InitVulkan(VulkanWindow* window);
 	void Cleanup();
 
 	vk::DeviceMemory AllocateAndBindMemory(vk::Image image, vk::MemoryPropertyFlags memoryFlags = vk::MemoryPropertyFlagBits::eDeviceLocal, vk::MemoryAllocateInfo* allocInfoOut = nullptr);

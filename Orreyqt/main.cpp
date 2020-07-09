@@ -19,7 +19,7 @@ int main(int argc, char* argv[])
 	MainWindow mainwindow(vulkanwindow);
 	mainwindow.show();
 
-	vulkanwindow->Run();
+	vulkanwindow->startRender();
 
 
 	return a.exec();

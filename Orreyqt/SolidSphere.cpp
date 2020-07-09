@@ -9,18 +9,18 @@ SolidSphere::SolidSphere(float radius, size_t stacks, size_t slices)		//Create t
 {
 	// Adapated from: https://github.com/Erkaman/cute-deferred-shading/blob/master/src/main.cpp#L573
 
-	float lengthInv = 1.0 / radius;
+//	float lengthInv =(float) (1.0 / radius);
 	// loop through stacks.
 	for (int i = 0; i <= stacks; ++i) {
 
 		float V = (float)i / (float)stacks;
-		float phi = V * M_PI;
+		float phi =(float)( V * M_PI);
 
 		// loop through the slices.
 		for (int j = 0; j <= slices; ++j) {
 
 			float U = (float)j / (float)slices;
-			float theta = U * (M_PI * 2);
+			float theta =(float) (U * (M_PI * 2));
 
 			// use spherical coordinates to calculate the positions.
 			float x = cos(theta) * sin(phi) * radius;

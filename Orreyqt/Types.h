@@ -22,7 +22,7 @@ namespace VulkanTools
 
 		inline uint32_t getExtensionCount() const
 		{
-			return extensions.size();
+			return (uint32_t)extensions.size();
 		}
 
 		inline void addExtension(std::string extension)
