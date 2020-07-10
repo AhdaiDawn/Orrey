@@ -177,12 +177,12 @@ void MainWindow::setupUI()
 
 	FPSLabel->setText(QCoreApplication::translate("Form", "FPS\357\274\232", nullptr));
 	addNumButton->setText(QCoreApplication::translate("Form", "AddNum", nullptr));
-	subSizeButton->setText(QCoreApplication::translate("Form", "SubSize", nullptr));
-	addSizeButton->setText(QCoreApplication::translate("Form", "AddSize", nullptr));
+	subSizeButton->setText(QCoreApplication::translate("Form", "SubAU", nullptr));
+	addSizeButton->setText(QCoreApplication::translate("Form", "AddAU", nullptr));
 	hideButton->setText(QCoreApplication::translate("Form", "HideOrbit", nullptr));
 	speedLabel->setText(QCoreApplication::translate("Form", "\351\200\237\345\272\246", nullptr));
 	pauseButton->setText(QCoreApplication::translate("Form", "Pause", nullptr));
-	planetSizeLabel->setText(QCoreApplication::translate("Form", "\350\241\214\346\230\237\347\274\251\346\224\276\357\274\232", nullptr));
+	planetSizeLabel->setText(QCoreApplication::translate("Form", "\350\267\235\347\246\273\347\274\251\346\224\276\357\274\232", nullptr));
 	subNumButton->setText(QCoreApplication::translate("Form", "SubNum", nullptr));
 	grabButton->setText(QCoreApplication::translate("Form", "Screenshot", nullptr));
 	quitButton->setText(QCoreApplication::translate("Form", "Quit", nullptr));

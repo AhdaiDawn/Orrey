@@ -32,9 +32,9 @@ public:
 	void keyPressEvent(QKeyEvent*) override;
 	void keyReleaseEvent(QKeyEvent*) override;
 	void wheelEvent(QWheelEvent*) override;
-//	void resizeEvent(QResizeEvent* ev) override {
-//		spdlog::info("Image extent: {} {}", this->width(), this->height());
-//	}
+	//	void resizeEvent(QResizeEvent* ev) override {
+	//		spdlog::info("Image extent: {} {}", this->width(), this->height());
+	//	}
 
 	void startRender();
 	void init();
@@ -83,8 +83,8 @@ private:
 
 
 	int objects_per_group = 512;  //小行星每组多少个
-	int saturn_ring_object_count = 1024*3; //木星环的数量 3000
-	int astroid_belt_max_object_count = 512*100; //小行星环个数 250000
+	int saturn_ring_object_count = 1024 * 3; //木星环的数量 3000
+	int astroid_belt_max_object_count = 512 * 100; //小行星环个数 250000
 	int object_scale = 15; //缩放 5-30 step 5
 
 	bool m_mouse_pressed = false;

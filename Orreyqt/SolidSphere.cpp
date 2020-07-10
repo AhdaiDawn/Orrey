@@ -7,7 +7,7 @@ SolidSphere::SolidSphere()
 
 SolidSphere::SolidSphere(float radius, size_t stacks, size_t slices)		//Create the planet spheare with normals.
 {
-	// Adapated from: https://github.com/Erkaman/cute-deferred-shading/blob/master/src/main.cpp#L573
+	// ²Î¿¼ÓÚ https://github.com/Erkaman/cute-deferred-shading/blob/master/src/main.cpp#L573
 
 //	float lengthInv =(float) (1.0 / radius);
 	// loop through stacks.

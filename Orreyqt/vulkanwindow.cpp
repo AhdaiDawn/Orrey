@@ -6,7 +6,6 @@
 #include<cstdio>
 #include "vulkanwindow.h"
 
-
 VulkanWindow::VulkanWindow()
 {
 	m_timer = new QTimer(this);
@@ -140,7 +139,7 @@ void VulkanWindow::init() {
 	m_graphics.ubo.view = glm::rotate(m_graphics.ubo.view, glm::radians(m_camera.rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
 	m_graphics.ubo.view = glm::rotate(m_graphics.ubo.view, glm::radians(m_camera.rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
 
-	
+
 	//可以自由移动
 //	glm::vec3 cameraPos = glm::vec3(0.0f, 100.0f, 100.0f);
 //	glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
@@ -179,7 +178,7 @@ void VulkanWindow::init() {
 	spdlog::info("Loaded textures");
 
 
-	//Create query pool to time compute, and rendering times
+	//创建查询池以计算时间和渲染时间
 	vk::QueryPoolCreateInfo queryPoolInfo = vk::QueryPoolCreateInfo({}, vk::QueryType::eTimestamp, 2, {});
 	m_queryPool = m_vulkanResources->device.createQueryPool(queryPoolInfo);
 	m_queryResults.resize(2);
@@ -207,7 +206,7 @@ void VulkanWindow::PrepareInstance()
 	while (objectsToSpawn % objects_per_group != 0) //Reduce astroid count until it divides nicely with objects per group
 		objectsToSpawn--;
 
-	//Converted G constant for AU/SM, T: 1s ~= 1 earth sidereal day
+	//Converted G constant for AU/SM, T: 1s ~= 1 天
 	const double G = 0.0002959122083;
 	auto initialVelocity = [G](float r, float mass = 1.0) { return sqrt((G * mass) / r);  };
 	auto degToRad = [](float deg) {return (float)(deg * M_PI / 180); };
@@ -284,7 +283,7 @@ void VulkanWindow::PrepareInstance()
 		objects[i].colourTint = glm::vec4(colourTint, colourTint, colourTint, 1.0);
 	}
 
-	//Upload instance data into its buffer
+	//上传实例数据到缓冲中
 	uint32_t size = objects.size() * sizeof(CelestialObj);
 	vko::Buffer instanceStagingBuffer = CreateBuffer(size, vk::BufferUsageFlagBits::eTransferSrc, objects.data());
 	m_bufferInstance = CreateBuffer(size, vk::BufferUsageFlagBits::eVertexBuffer | vk::BufferUsageFlagBits::eStorageBuffer | vk::BufferUsageFlagBits::eTransferDst, nullptr, vk::MemoryPropertyFlagBits::eDeviceLocal);
@@ -578,9 +577,10 @@ void VulkanWindow::RenderFrame()
 	vk::PresentInfoKHR presentInfo = vk::PresentInfoKHR(1, &m_vulkanResources->semaphoreRender[m_frameID], 1, swapchains, &imageIndex.value);
 
 	m_vulkanResources->queueGraphics.presentKHR(presentInfo);
-	m_vulkanResources->queueGraphics.waitIdle();
 
-	//spdlog::info("\Instance draw time = {}ms", GetTimeQueryResult(m_queueIDs.graphics.timestampValidBits));
+	m_vulkanResources->queueGraphics.waitIdle();//等待
+
+	spdlog::info("\Instance draw time = {}ms", GetTimeQueryResult(m_queueIDs.graphics.timestampValidBits));
 
 	vk::SubmitInfo computeSubmitInfo = vk::SubmitInfo();
 	computeSubmitInfo.waitSemaphoreCount = 1;
@@ -594,7 +594,7 @@ void VulkanWindow::RenderFrame()
 
 	m_vulkanResources->queueCompute.submit(computeSubmitInfo, nullptr);
 
-	//spdlog::info("\Compute time = {}ms", GetTimeQueryResult(m_queueIDs.compute.timestampValidBits));
+	spdlog::info("\Compute time = {}ms", GetTimeQueryResult(m_queueIDs.compute.timestampValidBits));
 
 	m_frameID = (m_frameID + 1) % m_vulkanResources->swapchain.GetImageCount();
 }
@@ -859,7 +859,7 @@ void VulkanWindow::MainLoop() {
 	if (m_camera.viewUpdated)
 		UpdateCameraUniformBuffer();
 
-	UpdateComputeUniformBuffer();
+	UpdateComputeUniformBuffer(); //速度改变时
 
 	auto tEnd = std::chrono::high_resolution_clock::now();
 	auto tDiff = std::chrono::duration<double, std::milli>(tEnd - tStart).count();
@@ -871,7 +871,7 @@ void VulkanWindow::MainLoop() {
 	m_totalRunTime += m_frameTime;
 	if (m_totalRunTime >= m_seconds)
 	{
-		//		spdlog::info("\tRuntime = {}", m_seconds);
+		spdlog::info("\tRuntime = {}", m_seconds);
 		m_seconds += 1;
 	}
 }
