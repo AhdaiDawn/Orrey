@@ -6,9 +6,6 @@
 #include<cstdio>
 #include "vulkanwindow.h"
 
-#define WIDTH 1920
-#define HEIGHT 1080
-#define FULLSCREEN false
 
 VulkanWindow::VulkanWindow()
 {
@@ -143,12 +140,13 @@ void VulkanWindow::init() {
 	m_graphics.ubo.view = glm::rotate(m_graphics.ubo.view, glm::radians(m_camera.rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
 	m_graphics.ubo.view = glm::rotate(m_graphics.ubo.view, glm::radians(m_camera.rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
 
+	
 	//可以自由移动
 //	glm::vec3 cameraPos = glm::vec3(0.0f, 100.0f, 100.0f);
 //	glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 //	glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 //	cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * 100.0f;
-//	m_graphics.ubo.view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+//	m_graphics.ubo.view = m_graphics.ubo.view*glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 
 	m_graphics.ubo.model = glm::mat4(1.0f);
 
@@ -662,12 +660,6 @@ void VulkanWindow::subObjectSize() {
 
 void VulkanWindow::UpdateCameraUniformBuffer()
 {
-	//	位移
-//	m_camera.position.x *= 10;
-//	glm::mat4 trans = glm::mat4(1.0f);
-//	trans = glm::translate(trans, m_camera.position);
-//	m_graphics.ubo.view = trans * m_graphics.ubo.view;
-
 	m_graphics.ubo.view = glm::translate(glm::mat4(1.0f), glm::vec3(0.0, 0.0, m_camera.zoom));
 	m_graphics.ubo.view = glm::rotate(m_graphics.ubo.view, glm::radians(m_camera.rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
 	m_graphics.ubo.view = glm::rotate(m_graphics.ubo.view, glm::radians(m_camera.rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));

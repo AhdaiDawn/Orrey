@@ -12,6 +12,10 @@
 #include <QtWidgets/QTreeWidget>
 #include <QtWidgets/QTextBrowser>
 
+#define WIDTH 1500
+#define HEIGHT 1000
+#define FULLSCREEN false
+
 MainWindow::MainWindow(VulkanWindow* vwindow) :vulkanwindow(vwindow)
 {
 
@@ -83,7 +87,7 @@ MainWindow::MainWindow(VulkanWindow* vwindow) :vulkanwindow(vwindow)
 	astroidNumlabel = new QLabel();
 	gridLayout->addWidget(astroidNumlabel, 3, 3, 1, 2);
 
-	astroidNumLcd = new QLCDNumber(6);
+	astroidNumLcd = new QLCDNumber(8);
 	astroidNumLcd->setSegmentStyle(QLCDNumber::Filled);
 	astroidNumLcd->setSegmentStyle(QLCDNumber::Flat);
 	astroidNumLcd->setStyleSheet("border: 1px solid green; color: green; background: silver;");
@@ -141,7 +145,7 @@ MainWindow::MainWindow(VulkanWindow* vwindow) :vulkanwindow(vwindow)
 		});
 
 	//	lastGeometry = QRect(0, 0, 2560, 1600);
-	lastGeometry = QRect(0, 0, 2500, 1500);
+	lastGeometry = QRect(0, 0, WIDTH, HEIGHT);
 	this->setGeometry(lastGeometry);
 }
 
